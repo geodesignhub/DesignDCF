@@ -604,6 +604,8 @@
             for (var h=0; h < syslen;h++){
                 // iterate over system
                 var cursys = sys[h];
+                
+                if (cursys.diagrams.length >0)  {
                 // create a new row
                 var yrCounter  =0 
                 if (headcounter === 0){ // header row
@@ -642,7 +644,7 @@
                 } // header is added. 
 
                 // add system row 
-                var sysrowHTML = "<tr><td class='initCol sysrow'>"+cursys.sysname+"</td>";
+                var sysrowHTML = "<tr><td class='initCol sysrow sysheader'>"+cursys.sysname+"</td>";
                     for (var g1=0; g1< numYears; g1++){
                          sysrowHTML += "<td class='sysrow'>&nbsp;</td>";
                     }
@@ -748,6 +750,7 @@
                     // $('#npv tbody>tr:last').after(npvHTML);
                     // footercounter +=1;
                 } // header is added. 
+            }
             }
             systems = sys;
         }

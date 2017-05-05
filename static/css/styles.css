@@ -427,3 +427,6 @@ ul.input-list li {
 .header {
     text-align: right;
 }
+.sysheader {
+    font-size: 15px;
+}
