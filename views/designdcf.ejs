@@ -818,7 +818,13 @@
                 }
                 $("#"+diagID + "-all-invest").html(tInvest);
                 // var annualIncome = abbrNum(curInvestmentdata['income']['yearly'],1);
-                var totalIncome = abbrNum(curInvestmentdata['income']['total'],1);
+                var totalIncome;
+                if (pprint){
+                    totalIncome = abbrNum(curInvestmentdata['income']['total'],1);
+                }
+                else{
+                    totalIncome = parseFloat(curInvestmentdata['income']['total']).toFixed(2);
+                }
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#"+ diagID+ "-"+"total-income").html(totalIncome);
                   for (var t1=0; t1< numYears; t1++){
