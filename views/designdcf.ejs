@@ -79,7 +79,23 @@
                 
             </div>
         </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+            </div>
 
+            <div class="col-md-6 text-right">
+            <div class="btn-group" data-toggle="buttons">
+
+                <label class="btn btn-default">
+                    <input type="radio" name="pprintdisplay" value="raw">Raw
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="pprintdisplay" value="pprint" checked="">Pretty Print
+                </label>
+            </div>
+            </div>
+          </div> 
 
         <div class="row">
             <div class="col-md-12"> 
@@ -778,22 +794,28 @@
                 if (e.data.mode === 'status') {
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
-                    populateInvestment(JSON.parse(e.data.output), true);
-                    investmentdata = JSON.parse(e.data.output)
-                    computeDCFNPV(investmentdata);
+                    var raworpp = $('input:radio[name="pprintdisplay"]:checked').val();
+                    var pprint = (raworpp == 'raw')? 0:1;
+                    investmentdata = JSON.parse(e.data.output);
+                    populateIncomeInvestment(investmentdata, pprint);
+                    computeDCFNPV(investmentdata, pprint);
                     $("#loadingGIF").hide();
                 }
             }, false);
 
         }
 
-        function populateInvestment(investmentdata, clearAll){
-
+        function populateIncomeInvestment(investmentdata, pprint){
             for (var g=0; g< investmentdata.length; g++){
                 var curInvestmentdata= investmentdata[g];
                 var diagID = curInvestmentdata['id'];
                 var totalInvestment = curInvestmentdata['totalInvestment'];
-                var tInvest = abbrNum(totalInvestment,1);
+                var tInvest;
+                if(pprint) {
+                tInvest = abbrNum(totalInvestment,1);
+                } else {
+                 tInvest = parseFloat(totalInvestment).toFixed(2);   
+                }
                 $("#"+diagID + "-all-invest").html(tInvest);
                 // var annualIncome = abbrNum(curInvestmentdata['income']['yearly'],1);
                 var totalIncome = abbrNum(curInvestmentdata['income']['total'],1);
@@ -805,11 +827,23 @@
                         var cIncome = curInvestmentdata['income'];
                         var totalIncome = curInvestmentdata['income']['total'];
                          if (currentYear in cInvest) {
-                            var yearlyInvest = abbrNum(cInvest[currentYear],1);
+                            var yearlyInvest =0;
+                            if (pprint) {
+                                yearlyInvest = abbrNum(cInvest[currentYear],1);
+                            }
+                            else{
+                                 yearlyInvest = parseFloat(cInvest[currentYear]).toFixed(2);
+                            }
                             $("#"+ diagID+ "-"+currentYear+"-invest").html(yearlyInvest);
                          }
-                        var yearlyIncome = abbrNum(cIncome[currentYear],1);
-                        $("#"+ diagID+ "-"+currentYear+"-income").html(yearlyIncome);
+                            var yearlyIncome = 0;
+                            if (pprint) {
+                                yearlyIncome = abbrNum(cIncome[currentYear],1);
+                            }
+                            else{
+                                yearlyIncome = parseFloat(cIncome[currentYear]).toFixed(2);
+                            }
+                            $("#"+ diagID+ "-"+currentYear+"-income").html(yearlyIncome);
                         // var totalIncome = 
                         // $("#"+ diagID+ "-"+"growth").html(0.03);
 
@@ -820,7 +854,7 @@
 
 
         }
-        function computeDCFNPV(investmentdata){
+        function computeDCFNPV(investmentdata, pprint){
            
             var wacc = (parseFloat($("#wacc-slider").val()) / 100);
 
@@ -868,25 +902,57 @@
                     dcf.push(parseInt(curdcf));
                     var abscurDCF = Math.abs(curdcf);
                     if (curdcf < 0) {
-                    $("#"+ curSys['id']+"-"+cYear+"-dcf").html('(' + abbrNum(abscurDCF, 1)+')');
+                        if(pprint){
+                            $("#"+ curSys['id']+"-"+cYear+"-dcf").html('(' + abbrNum(abscurDCF, 1)+')');
+                        }
+                        else{
+                            $("#"+ curSys['id']+"-"+cYear+"-dcf").html(parseFloat(curdcf).toFixed(2));
+                        }
                     }   
                     else {
-                    $("#"+ curSys['id']+"-"+cYear+"-dcf").html(abbrNum(abscurDCF, 1));
-                }
+                        if(pprint){
+                            $("#"+ curSys['id']+"-"+cYear+"-dcf").html(abbrNum(abscurDCF, 1));
+                        }
+                        else{
+
+                            $("#"+ curSys['id']+"-"+cYear+"-dcf").html(parseFloat(curdcf).toFixed(2));
+                        }
+                    }
                     var yearlyIncome = yearlyIncomeTotal[cYear];
                     var yearlyInvestment = yearlyInvestmentTotal[cYear];
                     var absyearlyIncome = Math.abs(yearIncome);
                     var absyearlyInvestment = Math.abs(yearlyInvestment);
                     if (yearlyIncome < 0) {
-                    $("#"+ +cYear+"-total-income").html('(' + abbrNum(yearlyIncome,1)+')');
-                } else{
-                     $("#"+ +cYear+"-total-income").html(abbrNum(yearlyIncome,1));
-                }
+                        if (pprint){
+                            $("#"+ +cYear+"-total-income").html('(' + abbrNum(yearlyIncome,1)+')');
+                        }
+                        else{
+                            $("#"+ +cYear+"-total-income").html(parseFloat(yearlyIncome).toFixed(2));
+                        }
+                    } else{
+                        if(pprint){
+                         $("#"+ +cYear+"-total-income").html(abbrNum(yearlyIncome,1));
+                        }
+                        else{
+                            $("#"+ +cYear+"-total-income").html(parseFloat(yearlyIncome).toFixed(2));
+                        }
+                    }
                 if (yearlyInvestment < 0) {
-                    $("#"+ +cYear+"-total-investment").html('(' + abbrNum(yearlyInvestment,1)+')');
+                    if (pprint){
+                        $("#"+ +cYear+"-total-investment").html('(' + abbrNum(yearlyInvestment,1)+')');
+                    }
+                    else
+                    {
+                        $("#"+ +cYear+"-total-investment").html(parseFloat(yearlyInvestment).toFixed(2));
+                    }
                 }
                 else {
+                    if(pprint){
                         $("#"+ +cYear+"-total-investment").html(abbrNum(yearlyInvestment,1));
+                    }
+                    else {
+                         $("#"+ +cYear+"-total-investment").html(parseFloat(yearlyInvestment).toFixed(2));
+                    }
                 }
                 }
 
@@ -895,24 +961,47 @@
                 }, 0);
                 var abstotaldcf = Math.abs(totaldcf);
                     if (totaldcf < 0){
-                        $("#"+curSys['id']+"-total-dcf").html('(' + abbrNum(abstotaldcf, 1) +')');
+                        if (pprint){
+                            $("#"+curSys['id']+"-total-dcf").html('(' + abbrNum(abstotaldcf, 1) +')');
+                        }
+                        else{
+                            $("#"+curSys['id']+"-total-dcf").html(parseFloat(totaldcf).toFixed(2));
+                        }
                     }
                         else {
-                        $("#"+curSys['id']+"-total-dcf").html(abbrNum(abstotaldcf, 1));
+                            if(pprint){
+                                $("#"+curSys['id']+"-total-dcf").html(abbrNum(abstotaldcf, 1));
+                            }
+                            else {
+                                $("#"+curSys['id']+"-total-dcf").html(parseFloat(totaldcf).toFixed(2));
+                            }
                     }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv =Math.abs(npv);
 
                 if (npv < 0){
-                $("#"+curSys['id']+"-total-npv").html('(' + abbrNum(absnpv, 1) +')');}
-                else{
-                $("#"+curSys['id']+"-total-npv").html(abbrNum(absnpv, 1));
+                    if (pprint){
+                        $("#"+curSys['id']+"-total-npv").html('(' + abbrNum(absnpv, 1) +')');
+                    }
+                    else {
+                        $("#"+curSys['id']+"-total-npv").html(parseFloat(npv).toFixed(2));
+                    }
                 }
-
-
+                else{
+                    if (pprint) {
+                        $("#"+curSys['id']+"-total-npv").html(abbrNum(absnpv, 1));
+                    }
+                    else {
+                        $("#"+curSys['id']+"-total-npv").html(parseFloat(npv).toFixed(2));
+                    }
+                }
             }
 
         }
+        $('input:radio[name="pprintdisplay"]').change(function (event) {
+                populateTableDataInit();
+
+        });
 
         initpercentSliders();
         generateInitTables();
