@@ -54,11 +54,11 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
                 numYears = 2;
             }
             // if the diagram exists get the number of years 
-
             // else default is 2
             curDiagDetails['totalInvestment'] = totalCost;
             curDiagDetails['investment'] = {};
             curDiagDetails['income'] = {};
+            curDiagDetails['maintainence'] = {};
             yearlyCost = parseFloat(totalCost / numYears);
 
             var tenpercentIncome = yearlyCost * 0.1;
@@ -87,10 +87,19 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
 
                 totalIncome += lastIncome;
                 lastIncome = newIncome;
-                
 
             }
             curDiagDetails['income']['total'] = totalIncome;
+
+            var threepercentMaintainece = -1 * yearlyCost * 0.03;
+            var lastIncome;
+            for (var k = 0; k < 20; k++) {
+                if (k < 19) {
+                    var sYear = (startyear + k);
+                    curDiagDetails['maintainence'][sYear] = threepercentMaintainece;
+                }
+            }
+
             diagCosts.push(curDiagDetails);
         }
     }
