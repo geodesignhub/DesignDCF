@@ -852,6 +852,19 @@
                 }
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#"+ diagID+ "-"+"total-income").html(totalIncome);
+
+                var totalMaint = curInvestmentdata['maintainence']['total'];
+                if (pprint){
+
+                    var abstotalMaint = Math.abs(totalMaint);
+                    totalMaint = '(' + abbrNum(abstotalMaint, 1)+')';
+                }
+                else{
+                    totalMaint = parseFloat(totalMaint).toFixed(2);
+                }
+                // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
+                $("#"+ diagID+ "-"+"total-maint").html(totalMaint);
+
                   for (var t1=0; t1< numYears; t1++){
                         var currentYear = (startyear + t1);
                         var cInvest = curInvestmentdata['investment'];

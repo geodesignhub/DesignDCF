@@ -90,16 +90,18 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
 
             }
             curDiagDetails['income']['total'] = totalIncome;
-
+            var totalMaintainence = 0;
             var threepercentMaintainece = -1 * yearlyCost * 0.03;
             var lastIncome;
             for (var k = 0; k < 20; k++) {
                 if (k < 19) {
                     var sYear = (startyear + k);
                     curDiagDetails['maintainence'][sYear] = threepercentMaintainece;
+                    totalMaintainence += threepercentMaintainece;
                 }
             }
 
+            curDiagDetails['maintainence']['total'] = totalMaintainence;
             diagCosts.push(curDiagDetails);
         }
     }
