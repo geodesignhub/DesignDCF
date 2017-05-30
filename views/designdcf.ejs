@@ -305,6 +305,7 @@
         var projectdetails = <%- projectdetails %>;
         var syndiagrams = <%- syndiagrams %>;
         var timeline = <%- timeline %>;
+        var bounds = <%- bounds %>;
         var investmentdata;
         var startyear = moment(projectdetails['startdate']).year();
         var investmentdata;
@@ -810,7 +811,8 @@
                 'systemdetails': JSON.stringify(systemdetail),
                 'systems': JSON.stringify(systems), 
                 'timeline': JSON.stringify(timeline), 
-                'startyear': JSON.stringify(startyear)
+                'startyear': JSON.stringify(startyear), 
+                'bounds': bounds['bounds']
             });
             areaWorker.addEventListener('message', function(e) {
                 if (e.data.mode === 'status') {

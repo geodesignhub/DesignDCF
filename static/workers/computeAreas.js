@@ -1,23 +1,55 @@
 importScripts('../js/turf.min.js');
 importScripts('../js/moment.min.js');
+importScripts('../js/rtree.min.js');
 
-function computeAreas(systemdetails, systems, timeline, startyear) {
+function computeAreas(systemdetails, systems, timeline, startyear, grid) {
     var systemdetails = JSON.parse(systemdetails);
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
     var startyear = parseInt(startyear);
     diagCosts = [];
+    var gridTree = RTree();
+    gridTree.geoJSON(grid);
+
     var syslen = systems.length;
     var sysdetlen = systemdetails.length;
     // for each diagram, compute the area
+    var addedIDs = [];
+    var relevantGrid = { "type": "FeatureCollection", "features": [] };
+
     for (var x = 0; x < syslen; x++) {
         var cSys = systems[x];
         var allDiagrams = cSys.diagrams;
         var allDiaglen = allDiagrams.length;
+        var curGridIntersects = [];
+        for (var n = 0; n < allDiaglen; n++) {
+            var curDiag = allDiagrams[n];
+            var cDFeatlen = curDiag.features.length;
+            // loop over each feature in the current diagram
+            for (var b = 0; b < cDFeatlen; b++) {
+                var curFeat = curDiag.features[b];
+                var curDiagbounds = turf.bbox(curFeat);
+                var cData = gridTree.bbox([curDiagbounds[0], curDiagbounds[1]], [curDiagbounds[2], curDiagbounds[3]]); // array of features
+                for (var g1 = 0; g1 < cData.length; g1++) {
+                    var curIFeatGrid = cData[g1];
+                    var curIFeatGridID = curIFeatGrid.properties.id;
+                    curGridIntersects.push(curIFeatGridID);
+                    const allReadyExists = addedIDs.includes(curIFeatGridID);
+                    if (allReadyExists) {} else {
+                        addedIDs.push(curIFeatGridID);
+                        relevantGrid.features.push(curIFeatGrid);
+                    }
+                }
+            }
+        }
+        // number of areas that this grid intersects. 
+        const relevantGridLen = relevantGrid.length;
+        console.log(JSON.stringify(curGridIntersects)); // these are the ids that are interesting for this system. 
         for (var y = 0; y < allDiaglen; y++) {
             var sysCost = 0;
             var cDiag = allDiagrams[y];
-            if (cDiag.features.length > 0) {
+            var cDFeatlen = cDiag.features.length;
+            if (cDFeatlen > 0) {
                 var diagID = cDiag.features[0].properties.diagramid;
                 var sysName = cDiag.features[0].properties.sysname;
             }
@@ -62,15 +94,23 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
             yearlyCost = parseFloat(totalCost / numYears);
 
             var tenpercentIncome = yearlyCost * 0.1;
-            var lastIncome;
-            for (var k = 0; k < numYears; k++) {
+            // for the relevant intersects add income to that  cell for that year. 
 
-                if (k < 19) {
+            // for (var idx = 0; idx < relevantGridLen; idx++) {
+            //     var element = relevantGrid[idx];
+            //     var relevantGridID = element.properties.id;
+            //     if (curGridIntersects.includes(relevantGridID)) {
+
+            //     }
+
+            // }
+            var lastIncome;
+            for (var k4 = 0; k4 < numYears; k4++) {
+                if (k4 < 19) {
                     var incomeIncrease = (tenpercentIncome * 0.03);
                     var newIncome = incomeIncrease + lastIncome;
-                    var sYear = (startyear + k);
+                    var sYear = (startyear + k4);
                     curDiagDetails['investment'][sYear] = yearlyCost;
-
                     lastIncome = newIncome;
                 }
             }
@@ -84,7 +124,6 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
                 var sYear = (startyear + k);
                 curDiagDetails['income'][sYear] = newIncome;
                 curDiagDetails['income']['yearly'] = tenpercentIncome;
-
                 totalIncome += lastIncome;
                 lastIncome = newIncome;
 
@@ -93,9 +132,9 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
             var totalMaintainence = 0;
             var threepercentMaintainece = -1 * yearlyCost * 0.03;
             var lastIncome;
-            for (var k = 0; k < 20; k++) {
-                if (k < 19) {
-                    var sYear = (startyear + k);
+            for (var k7 = 0; k7 < 20; k7++) {
+                if (k7 < 19) {
+                    var sYear = (startyear + k7);
                     curDiagDetails['maintainence'][sYear] = threepercentMaintainece;
                     totalMaintainence += threepercentMaintainece;
                 }
@@ -112,6 +151,52 @@ function computeAreas(systemdetails, systems, timeline, startyear) {
     });
 }
 
+function generateGrid(bounds, startyear, systems) {
+    var sys = JSON.parse(systems);
+    var syslen = sys.length;
+
+    function makeid() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 6; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+    bounds = bounds.split(",").map(function(item) {
+        return parseFloat(item, 10);
+    });
+    // 1 hectare grid
+    var g = turf.squareGrid(bounds, 0.1, 'kilometers');
+    var grid = { "type": "FeatureCollection", "features": [] };
+    var gridlen = g.features.length;
+    // var initCosts = [];
+
+    var startyear = parseInt(startyear);
+    // for (var k1 = 0; k1 < 20; k1++) {
+    //     var sYear = (startyear + k1);
+    //     var x = {};
+    //     x[sYear] = 0;
+    //     initCosts.push(x);
+    // }
+    for (var index = 0; index < gridlen; index++) {
+        var curgrid = g.features[index];
+        curgrid.properties.id = makeid();
+
+        // for (var e = 0; e < syslen; e++) {
+        //     var cursys = sys[e];
+        //     var sysid = cursys.id;
+        //     var d = { 'maintainence': initCosts, 'income': initCosts, 'dcf': initCosts };
+        //     curgrid.properties[sysid] = d;
+        // }
+        grid.features.push(curgrid);
+    }
+
+    return grid;
+
+}
 self.onmessage = function(e) {
-    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear);
+    grid = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
+    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, grid);
 }

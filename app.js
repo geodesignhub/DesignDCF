@@ -19,8 +19,8 @@ app.use(csrf({ cookie: true }));
 app.get('/', function(request, response) {
     var opts = {};
     if (request.query.apitoken && request.query.projectid && request.query.synthesisid && request.query.cteamid) {
-        var baseurl = 'https://www.geodesignhub.com/api/v1/projects/';
-        // var baseurl = 'http://local.dev:8000/api/v1/projects/';
+        // var baseurl = 'https://www.geodesignhub.com/api/v1/projects/';
+        var baseurl = 'http://local.dev:8000/api/v1/projects/';
 
         var apikey = request.query.apitoken;
         var cred = "Token " + apikey;
@@ -33,7 +33,7 @@ app.get('/', function(request, response) {
         var boundsurl = baseurl + projectid + '/bounds/';
         var syndiagramsurl = baseurl + projectid + '/cteams/' + cteamid + '/' + synthesisid + '/diagrams/';
         var projecturl = baseurl + projectid + '/';
-        var URLS = [synprojectsurl, boundsurl, timelineurl, systemsurl, projecturl,syndiagramsurl];
+        var URLS = [synprojectsurl, boundsurl, timelineurl, systemsurl, projecturl, syndiagramsurl];
 
         async.map(URLS, function(url, done) {
             req({
@@ -81,6 +81,7 @@ app.get('/', function(request, response) {
                     "projectid": request.query.projectid,
                     "status": 1,
                     "design": JSON.stringify(results[0]),
+                    "bounds": JSON.stringify(results[1]),
                     "systems": JSON.stringify(results[3]),
                     "timeline": JSON.stringify(timeline),
                     "projectdetails": JSON.stringify(results[4]),
@@ -93,7 +94,7 @@ app.get('/', function(request, response) {
         });
 
     } else {
-        opts = { 'csrfToken': request.csrfToken(), 'systemdetail': '0', 'apitoken': '0', 'projectid': '0', 'cteamid': '0', "diagramdetail": '0', 'systems': '0', 'synthesisid': '0',"projectdetails":'0' };
+        opts = { 'csrfToken': request.csrfToken(), 'systemdetail': '0', 'apitoken': '0', 'projectid': '0', 'cteamid': '0', "diagramdetail": '0', 'systems': '0', 'synthesisid': '0', "projectdetails": '0' };
         response.render('designdcf', opts);
     }
 
