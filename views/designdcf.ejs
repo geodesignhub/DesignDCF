@@ -58,11 +58,11 @@
         <!-- Heading Row -->
 
         <div class="row">
-            <!-- <div class="col-md-6">
+             <div class="col-md-6">
                 <h3>Design Synthesis</h3>
                 <div id="inputmap"></div>
-            </div> -->
-            <div class="col-md-12">
+            </div> 
+            <div class="col-md-6">
                 <h3 id="designName">Discounted Cash Flow Analysis</h3>
                 <p class="description">This plugin downloads a design from Geodesign Hub, computes its area and construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow" target="_blank">Discounted Cash Flow</a> analysis to calculate Net
                     Present Value of this design. Choose the WACC and click on Compute Net Present Value, then you can copy paste it in Excel.</p><br><br>
@@ -73,25 +73,47 @@
                 <h3>Design Synthesis</h3>
                 <div id="inputmap"></div>
             </div> -->
-            <div class="col-md-4">
+            <div class="col-md-6">
 
                 <h5>Weighted Annual Cost of Capital (WACC)</h5>
-                <p><input type="text" id="wacc-slider" name="wacc" value="" /></p>
+                <p class='ionslider'><input type="text" id="wacc-slider" name="wacc" value="" /></p>
                 <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button>&nbsp;&nbsp;<span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
                 </p>
 
 
             </div>
 
-            <div class="col-md-8"></div>
-        </div>
-        <br>
-        <div class="row">
             <div class="col-md-6">
+            
                 <div id="systemsCBCont" style="display:none">
                     <h4>Systems</h4>
                     <div id="systemsCB"></div>
                 </div>
+            </div>
+               
+        </div>
+
+        <br>
+        <div class="row">
+        <div class="col-md-4">
+            <h4>Investment Map</h4>
+            <div id="investmentMap" class="map"></div>
+        </div>
+        <div class="col-md-4">
+            <h4>Income Map</h4>
+            <div id="incomeMap" class="map"></div>
+        </div>
+        <div class="col-md-4">
+            <h4>Maintainence Map</h4>
+            <div id="maintainenceMap" class="map"></div>
+        </div>
+        </div>
+        <br>
+        <hr>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                
             </div>
 
             <div class="col-md-6 text-right">
@@ -226,6 +248,7 @@
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/js/colors.js"></script>
     <script type="text/javascript" src="assets/js/leaflet.js"></script>
+    <script type="text/javascript" src="assets/js/choropleth.js"></script>
     <script type="text/javascript" src="assets/js/money.min.js"></script>
     <script type="text/javascript" src="assets/js/moment.min.js"></script>
 
@@ -325,24 +348,27 @@
         var timeline = <%- timeline %>;
         var bounds = <%- bounds %>;
         var investmentdata;
+        var overallgrid;
+        var diaggrid; 
+
         var startyear = moment(projectdetails['startdate']).year();
-        var investmentdata;
-        // var inputmap = L.map('inputmap', {
-        //     'zoomControl': false,
-        //     'dragging': false,
-        //     'touchZoom': false,
-        //     'scrollWheelZoom': false,
-        //     'doubleClickZoom': false
-        // });
-        // var inputbaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-        //     maxZoom: 18,
-        // }).addTo(inputmap);
-        // var inputLayer = L.featureGroup().addTo(inputmap);
-        // var diagramLayer = L.geoJSON(design, {
-        //     style: miniMapstyleComp
-        // }).addTo(inputLayer);
-        // inputmap.fitBounds(inputLayer.getBounds());
+
+        var inputmap = L.map('inputmap', {
+            'zoomControl': false,
+            'dragging': false,
+            'touchZoom': false,
+            'scrollWheelZoom': false,
+            'doubleClickZoom': false
+        });
+        var inputbaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 18,
+        }).addTo(inputmap);
+        var inputLayer = L.featureGroup().addTo(inputmap);
+        var diagramLayer = L.geoJSON(design, {
+            style: miniMapstyleComp
+        }).addTo(inputLayer);
+        inputmap.fitBounds(inputLayer.getBounds());
 
 
         function abbrNum(number, decPlaces) {
@@ -869,12 +895,127 @@
                 if (e.data.mode === 'status') {
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
-
+                    // console.log(e.data.incomeGrid);
+                    var incomeGrid = JSON.parse(e.data.incomeGrid);
+                    var investmentGrid = JSON.parse(e.data.investmentGrid);
+                    var maintainenceGrid = JSON.parse(e.data.maintainenceGrid);
+                    plotIncomeMap(incomeGrid);
+                    plotInvestmentMap(investmentGrid);
+                    plotMaintainenceMap(maintainenceGrid);
+                    // paint on map.
                 }
             }, false);
 
         }
+         var incomemap = L.map('incomeMap', {
+            'zoomControl': false,
+            'dragging': false,
+            'touchZoom': false,
+            'scrollWheelZoom': false,
+            'doubleClickZoom': false
+        });
+        var incomeBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 18,
+        }).addTo(incomemap);
+        var incomeLayer = L.featureGroup().addTo(incomemap);
+        
 
+         var investmentmap = L.map('investmentMap', {
+            'zoomControl': false,
+            'dragging': false,
+            'touchZoom': false,
+            'scrollWheelZoom': false,
+            'doubleClickZoom': false
+        });
+        var incomeBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 18,
+        }).addTo(investmentmap);
+        var investmentLayer = L.featureGroup().addTo(investmentmap);
+
+
+
+         var maintainencemap = L.map('maintainenceMap', {
+            'zoomControl': false,
+            'dragging': false,
+            'touchZoom': false,
+            'scrollWheelZoom': false,
+            'doubleClickZoom': false
+        });
+        var maintainenceBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 18,
+        }).addTo(maintainencemap);
+        var maintainenceLayer = L.featureGroup().addTo(maintainencemap);
+
+
+        var bnds = bounds['bounds'];
+        var latLngs = bnds.split(',');
+        var southWest = L.latLng(latLngs[1], latLngs[0]);
+        var northEast = L.latLng(latLngs[3], latLngs[2]);
+        var mB = new L.latLngBounds(southWest, northEast);
+
+        incomemap.fitBounds(mB);
+        investmentmap.fitBounds(mB);
+        maintainencemap.fitBounds(mB);
+
+        function plotIncomeMap(incomeGrid){
+            L.choropleth(incomeGrid, {
+                valueProperty: 'totalIncome',
+                scale: ['white', 'green'],
+                steps: 5,
+                mode: 'e',
+                style: {
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.8
+                },
+                onEachFeature: function (feature, layer) {
+                layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    feature.properties.totalIncome.toLocaleString() + ' incidents')
+                }
+            }).addTo(incomeLayer);
+
+        }
+
+        function plotInvestmentMap(investmentGrid){
+            L.choropleth(investmentGrid, {
+                valueProperty: 'totalInvestment',
+                scale: ['white', 'red'],
+                steps: 5,
+                mode: 'e',
+                style: {
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.8
+                },
+                onEachFeature: function (feature, layer) {
+                layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    feature.properties.totalInvestment.toLocaleString() + ' incidents')
+                }
+            }).addTo(investmentLayer);
+
+        }
+
+        function plotMaintainenceMap(maintainenceGrid){
+            L.choropleth(maintainenceGrid, {
+                valueProperty: 'totalMaintainence',
+                scale: ['white', 'blue'],
+                steps: 5,
+                mode: 'e',
+                style: {
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.8
+                },
+                onEachFeature: function (feature, layer) {
+                layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    feature.properties.totalMaintainence.toLocaleString() + ' incidents')
+                }
+            }).addTo(maintainenceLayer);
+
+        }
         function populateIncomeInvestment(investmentdata, pprint) {
             for (var g = 0; g < investmentdata.length; g++) {
                 var curInvestmentdata = investmentdata[g];
@@ -1112,6 +1253,7 @@
                 var selectedsystems = [];
                 $('#systemsCB input:checked').each(function() {
                     selectedsystems.push($(this).attr('id'));
+
                 });
 
                 // hide rest from map, 

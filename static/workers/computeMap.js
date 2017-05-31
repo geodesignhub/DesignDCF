@@ -36,7 +36,8 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                     var curData = filteredinvestmentData[i1]; // current investment data
                     var diagID = curData.id; // diagram id of the current investment
                     var filteredIDs = diagGrid[diagID]; // the grid IDs that this diagram intersects. 
-                    for (var i2 = 0; i2 < filteredIDs.length; i2++) {
+                    var filteredGridlen = filteredIDs.length; // number of grid cells that this diagram intersects
+                    for (var i2 = 0; i2 < filteredGridlen; i2++) {
                         var curDiagGrid = filteredIDs[i2]; // the unique ID of the idagram. 
                         for (var i3 = 0; i3 < grid.features.length; i3++) {
                             var curGrid = grid.features[i3];
@@ -46,27 +47,27 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                 var totalInvest = curData.totalInvestment;
                                 var yearlyInvestment = curData.investment;
 
-                                var incomeGrid;
+                                var incGrid;
                                 var yearlyIncome = curData.income;
 
-                                var maintainenceGrid;
+                                var maintGrid;
                                 var yearlyMaintainence = curData.maintainence;
 
                                 if (addedIDs.includes(curGridID)) { // someone has already added the data, retrive it and work with it. 
                                     investGrid = finalInvestmentGrid[curGridID];
-                                    var newtotalInvest = curData.totalInvestment;
+                                    var newtotalInvest = (curData.totalInvestment / filteredGridlen);
                                     var origInvest = investGrid.properties.totalInvestment;
                                     investGrid.properties.totalInvestment = (origInvest + newtotalInvest);
 
-                                    incomeGrid = finalIncomeGrid[curGridID];
-                                    var newtotalIncome = curData.income['total'];
-                                    var origIncome = incomeGrid.properties.totalIncome;
-                                    incomeGrid.properties.totalIncome = (origIncome + newtotalIncome);
+                                    incGrid = finalIncomeGrid[curGridID];
+                                    var newtotalIncome = (curData.income['total'] / filteredGridlen);
+                                    var origIncome = incGrid.properties.totalIncome;
+                                    incGrid.properties.totalIncome = (origIncome + newtotalIncome);
 
-                                    maintainenceGrid = finalMaintainenceGrid[curGridID];
-                                    var newtotalMaintainence = curData.maintainence['total'];
-                                    var origMaintainence = maintainenceGrid.properties.totalMaintainence;
-                                    maintainenceGrid.properties.totalMaintainence = (origMaintainence + newtotalMaintainence);
+                                    maintGrid = finalMaintainenceGrid[curGridID];
+                                    var newtotalMaintainence = (curData.maintainence['total'] / filteredGridlen);
+                                    var origMaintainence = maintGrid.properties.totalMaintainence;
+                                    maintGrid.properties.totalMaintainence = (origMaintainence + newtotalMaintainence);
 
 
                                     var origYearlyInvestment = investGrid.properties.investment;
@@ -77,50 +78,46 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     });
                                     investGrid.properties.investment = newYearlyInvestment;
 
-                                    var origYearlyIncome = incomeGrid.properties.income;
+                                    var origYearlyIncome = incGrid.properties.income;
                                     var curYearlyIncome = curData.income;
                                     var newYearlyIncome = {};
                                     Object.keys(origYearlyIncome).map(function(a) {
                                         newYearlyIncome[a] = origYearlyIncome[a] + curYearlyIncome[a]
                                     });
-                                    incomeGrid.properties.income = newYearlyIncome;
+                                    incGrid.properties.income = newYearlyIncome;
 
 
-                                    var origYearlyMaintainence = maintainenceGrid.properties.income;
+                                    var origYearlyMaintainence = maintGrid.properties.income;
                                     var curYearlyMaintainence = curData.income;
                                     var newYearlyMaintainence = {};
                                     Object.keys(origYearlyMaintainence).map(function(a) {
                                         newYearlyMaintainence[a] = origYearlyMaintainence[a] + curYearlyMaintainence[a]
                                     });
-                                    maintainenceGrid.properties.maintainence = newYearlyMaintainence;
-
-
+                                    maintGrid.properties.maintainence = newYearlyMaintainence;
 
                                 } else {
                                     investGrid = curGrid;
-                                    investGrid.properties.totalInvestment = totalInvest;
+                                    investGrid.properties.totalInvestment = (totalInvest / filteredGridlen);
                                     investGrid.properties.investment = yearlyInvestment;
 
-                                    incomeGrid = curGrid;
-                                    incomeGrid.properties.income = yearlyIncome;
-                                    incomeGrid.properties.totalIncome = yearlyIncome['total'];
+                                    incGrid = curGrid;
+                                    incGrid.properties.income = yearlyIncome;
+                                    incGrid.properties.totalIncome = (yearlyIncome['total'] / filteredGridlen);
 
-                                    maintainenceGrid = curGrid;
-                                    maintainenceGrid.properties.maintainence = yearlyMaintainence;
-                                    maintainenceGrid.properties.totalMaintainence = yearlyMaintainence['total'];
+                                    maintGrid = curGrid;
+                                    maintGrid.properties.maintainence = yearlyMaintainence;
+                                    maintGrid.properties.totalMaintainence = (yearlyMaintainence['total'] / filteredGridlen);
 
                                 }
 
                                 addedIDs.push(curGridID);
                                 finalInvestmentGrid[curGridID] = investGrid; // assign back. 
+                                finalIncomeGrid[curGridID] = incGrid; // assign back. 
+                                finalMaintainenceGrid[curGridID] = maintGrid; // assign back. 
                             }
-
                         }
-
                     }
-
                 }
-
             }
         }
     }
@@ -140,9 +137,9 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
         }
     }
 
-    for (var gridid in finalMaintaintenceGrid) {
-        if (finalMaintaintenceGrid.hasOwnProperty(gridid)) {
-            var curMaintainenceGrid = finalMaintaintenceGrid[gridid];
+    for (var gridid in finalMaintainenceGrid) {
+        if (finalMaintainenceGrid.hasOwnProperty(gridid)) {
+            var curMaintainenceGrid = finalMaintainenceGrid[gridid];
             maintainenceGrid.features.push(curMaintainenceGrid);
         }
     }

@@ -29,6 +29,14 @@ h4 {
     height: 290px;
 }
 
+.map {
+    height: 300px;
+}
+
+.ionslider {
+    width: 300px;
+}
+
 .icon {
     width: 10px;
     height: 15px;
@@ -424,9 +432,11 @@ ul.input-list li {
 .hor-minimalist-b td.initCol {
     text-align: left;
 }
+
 .header {
     text-align: right;
 }
+
 .sysheader {
     font-size: 15px;
 }
