@@ -15,36 +15,51 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
     var sysdetlen = systemdetails.length;
     // for each diagram, compute the area
     var addedIDs = [];
+    var sysGrids = {};
+    var diagGrids = {};
     var relevantGrid = { "type": "FeatureCollection", "features": [] };
 
     for (var x = 0; x < syslen; x++) {
         var cSys = systems[x];
         var allDiagrams = cSys.diagrams;
+        var sysID = cSys.id;
         var allDiaglen = allDiagrams.length;
         var curGridIntersects = [];
+        var sysAddedIDs = [];
         for (var n = 0; n < allDiaglen; n++) {
+            var diagAddedIDs = [];
             var curDiag = allDiagrams[n];
             var cDFeatlen = curDiag.features.length;
-            // loop over each feature in the current diagram
-            for (var b = 0; b < cDFeatlen; b++) {
-                var curFeat = curDiag.features[b];
-                var curDiagbounds = turf.bbox(curFeat);
-                var cData = gridTree.bbox([curDiagbounds[0], curDiagbounds[1]], [curDiagbounds[2], curDiagbounds[3]]); // array of features
-                for (var g1 = 0; g1 < cData.length; g1++) {
-                    var curIFeatGrid = cData[g1];
-                    var curIFeatGridID = curIFeatGrid.properties.id;
-                    curGridIntersects.push(curIFeatGridID);
-                    const allReadyExists = addedIDs.includes(curIFeatGridID);
-                    if (allReadyExists) {} else {
-                        addedIDs.push(curIFeatGridID);
-                        relevantGrid.features.push(curIFeatGrid);
+            if (cDFeatlen > 0) {
+                var diagID = curDiag.features[0].properties.diagramid;
+
+                // loop over each feature in the current diagram
+                for (var b = 0; b < cDFeatlen; b++) {
+                    var curFeat = curDiag.features[b];
+                    var curDiagbounds = turf.bbox(curFeat);
+                    var cData = gridTree.bbox([curDiagbounds[0], curDiagbounds[1]], [curDiagbounds[2], curDiagbounds[3]]); // array of features
+                    for (var g1 = 0; g1 < cData.length; g1++) {
+                        var curIFeatGrid = cData[g1];
+                        var curIFeatGridID = curIFeatGrid.properties.id;
+                        curGridIntersects.push(curIFeatGridID);
+                        const allReadyExists = addedIDs.includes(curIFeatGridID);
+                        sysAddedIDs.push(curIFeatGridID);
+                        if (allReadyExists) {} else {
+                            addedIDs.push(curIFeatGridID);
+                            diagAddedIDs.push(curIFeatGridID);
+                            relevantGrid.features.push(curIFeatGrid);
+                        }
                     }
+
                 }
+                diagGrids[diagID] = diagAddedIDs;
             }
         }
+        sysGrids[sysID] = sysAddedIDs;
+
         // number of areas that this grid intersects. 
-        const relevantGridLen = relevantGrid.length;
-        console.log(JSON.stringify(curGridIntersects)); // these are the ids that are interesting for this system. 
+        // const relevantGridLen = relevantGrid.length;
+        // console.log(JSON.stringify(curGridIntersects)); // these are the ids that are interesting for this system. 
         for (var y = 0; y < allDiaglen; y++) {
             var sysCost = 0;
             var cDiag = allDiagrams[y];
@@ -59,6 +74,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
                 var sName = cSys['sysname'];
                 if (sName === sysName) {
                     sysCost = cSys['syscost'];
+                    curDiagDetails['sysid'] = cSys['id'];
                 }
             }
             var totArea;
@@ -147,6 +163,9 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
 
     // send investment
     self.postMessage({
+        'sysGrids': JSON.stringify(sysGrids),
+        'diagGrids': JSON.stringify(diagGrids),
+        'grid': JSON.stringify(relevantGrid),
         'output': JSON.stringify(diagCosts)
     });
 }
