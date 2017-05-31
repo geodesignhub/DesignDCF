@@ -274,7 +274,9 @@
         var ctx = $("#chart");
         var svgDrawing = SVG('drawing').size(10, 10);
         fx.base = "USD";
-
+        var incomeGrid;
+        var maintainenceGrid;
+        var investmentGrid;
         var numYears = 17; // number of colums; 
         function miniMapstyleComp(feature) {
             // console.log(feature.properties)
@@ -598,7 +600,6 @@
 
         };
 
-
         function initpercentSliders() {
             $("#wacc-slider").ionRangeSlider({
                 min: 0,
@@ -615,7 +616,13 @@
                 from: startyear,
                 step: 1,
                 grid: true,
-                prettify_enabled: true
+                prettify_enabled: true,
+                onFinish: function (data) {
+                    var tY = parseInt($("#yearly-slider").val());
+                    plotIncomeMap(incomeGrid,tY);
+                    // plotInvestmentMap(investmentGrid, tY);
+                    // plotMaintainenceMap(maintainenceGrid, tY);
+                }
             });
         }
 
@@ -884,7 +891,7 @@
                     var raworpp = $('input:radio[name="pprintdisplay"]:checked').val();
                     var pprint = (raworpp == 'raw') ? 0 : 1;
 
-                    populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all');
+                    populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all','all');
                     investmentdata = JSON.parse(e.data.output);
                     showallTables();
                     populateIncomeInvestment(investmentdata, pprint);
@@ -897,7 +904,7 @@
 
         }
 
-        function populateMaps(grid, sysGridIDs, diagGridIDs, idata, selectedsystems) {
+        function populateMaps(grid, sysGridIDs, diagGridIDs, idata, selectedsystems, totalorYearly) {
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
@@ -921,12 +928,12 @@
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
                     // console.log(e.data.incomeGrid);
-                    var incomeGrid = JSON.parse(e.data.incomeGrid);
-                    var investmentGrid = JSON.parse(e.data.investmentGrid);
-                    var maintainenceGrid = JSON.parse(e.data.maintainenceGrid);
-                    plotIncomeMap(incomeGrid);
-                    plotInvestmentMap(investmentGrid);
-                    plotMaintainenceMap(maintainenceGrid);
+                    incomeGrid = JSON.parse(e.data.incomeGrid);
+                    investmentGrid = JSON.parse(e.data.investmentGrid);
+                    maintainenceGrid = JSON.parse(e.data.maintainenceGrid);
+                    plotIncomeMap(incomeGrid,totalorYearly);
+                    plotInvestmentMap(investmentGrid,totalorYearly);
+                    plotMaintainenceMap(maintainenceGrid,totalorYearly);
                     // paint on map.
                 }
             }, false);
@@ -985,10 +992,38 @@
         investmentmap.fitBounds(mB);
         maintainencemap.fitBounds(mB);
 
-        function plotIncomeMap(incomeGrid) {
+        function plotIncomeMap(incomeGrid, yearlyOrTotal) {
+            
+            incomeLayer.clearLayers();
+            if (yearlyOrTotal === 'all'){
+
+                L.choropleth(incomeGrid, {
+                    valueProperty: 'totalIncome' , 
+                    // scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'e',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalIncome.toLocaleString() + ' incidents');
+                        var ps = feature.properties.totalIncome.toLocaleString(); 
+                        layer.bindPopup(ps);
+                    }
+                }).addTo(incomeLayer);
+            }
+
+            else {
             L.choropleth(incomeGrid, {
-                valueProperty: 'totalIncome',
-                scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+                valueProperty: function (feature) {
+                    return feature.properties.income[yearlyOrTotal]
+                },
+                // scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                 steps: 5,
                 mode: 'e',
                 style: {
@@ -997,36 +1032,82 @@
                     fillOpacity: 0.8
                 },
                 onEachFeature: function(feature, layer) {
-                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                        feature.properties.totalIncome.toLocaleString() + ' incidents')
+                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    //     feature.properties.totalIncome.toLocaleString() + ' incidents');
+                    var ps = (feature.properties.income[parseInt(yearlyOrTotal)])? feature.properties.income[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                    layer.bindPopup(ps);
                 }
             }).addTo(incomeLayer);
 
-        }
+            }
 
-        function plotInvestmentMap(investmentGrid) {
-            L.choropleth(investmentGrid, {
-                valueProperty: 'totalInvestment',
-                scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
-                steps: 5,
-                mode: 'e',
-                style: {
-                    color: '#fff',
-                    weight: 2,
-                    fillOpacity: 0.8
-                },
-                onEachFeature: function(feature, layer) {
-                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                        feature.properties.totalInvestment.toLocaleString() + ' incidents')
-                }
-            }).addTo(investmentLayer);
 
         }
 
-        function plotMaintainenceMap(maintainenceGrid) {
+        function plotInvestmentMap(investmentGrid,yearlyOrTotal) {
+            investmentLayer.clearLayers();
+
+            // var plotValue = (yearlyOrTotal === 'all') ? 'totalInvestment': yearlyOrTotal;
+            if (yearlyOrTotal === 'all'){
+
+                L.choropleth(investmentGrid, {
+                    valueProperty:  'totalInvestment' ,
+                    // scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'e',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
+                        var ps = feature.properties.totalInvestment.toLocaleString();
+                                   
+                        layer.bindPopup(ps);
+
+                    }
+                }).addTo(investmentLayer);
+            }
+            else{
+
+                L.choropleth(investmentGrid, {
+                    valueProperty:  function (feature) {
+                        return feature.properties.investment[yearlyOrTotal]
+                    },
+                    // scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'e',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
+                        var ps = (feature.properties.investment[parseInt(yearlyOrTotal)])? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                                          
+                        layer.bindPopup(ps);
+
+                    }
+                }).addTo(investmentLayer);
+            }
+        }
+
+        function plotMaintainenceMap(maintainenceGrid,yearlyOrTotal) {
+            maintainenceLayer.clearLayers();
+            var plotValue = (yearlyOrTotal === 'all') ? 'totalMaintainence': yearlyOrTotal;
+            if (yearlyOrTotal === 'all')  {
+
             L.choropleth(maintainenceGrid, {
                 valueProperty: 'totalMaintainence',
-                scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+                // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+
+                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                 steps: 5,
                 mode: 'e',
                 style: {
@@ -1035,11 +1116,40 @@
                     fillOpacity: 0.8
                 },
                 onEachFeature: function(feature, layer) {
-                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                        feature.properties.totalMaintainence.toLocaleString() + ' incidents')
+                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+                    var ps = feature.properties.totalMaintainence.toLocaleString();
+                           
+                    layer.bindPopup(ps);
+
+                }
+            }).addTo(maintainenceLayer);
+            } 
+            else {
+            L.choropleth(maintainenceGrid, {
+                    valueProperty:  function (feature) {
+                        return feature.properties.investment[yearlyOrTotal]
+                    },
+                // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+
+                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                steps: 5,
+                mode: 'e',
+                style: {
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                },
+                onEachFeature: function(feature, layer) {
+                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+                    var ps= (feature.properties.maintainence[parseInt(yearlyOrTotal)])? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : "0";              
+                    layer.bindPopup(ps);
+
                 }
             }).addTo(maintainenceLayer);
 
+            }
         }
 
         function populateIncomeInvestment(investmentdata, pprint) {
@@ -1274,8 +1384,12 @@
             var checked = $('input:radio[name="mapdisplay"]:checked').val();
             if (checked == 'total') {
                 $("#yearlySliderCont").hide();
+                plotIncomeMap(incomeGrid, 'all');
+                plotMaintainenceMap(maintainenceGrid,'all');
+                plotInvestmentMap(investmentGrid, 'all');
             } else {
                 $("#yearlySliderCont").show();
+                
             }
         });
 

@@ -74,7 +74,7 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     var curYearlyInvestment = curData.investment;
                                     var newYearlyInvestment = {};
                                     Object.keys(origYearlyInvestment).map(function(a) {
-                                        newYearlyInvestment[a] = origYearlyInvestment[a] + curYearlyInvestment[a]
+                                        newYearlyInvestment[a] = (origYearlyInvestment[a] / filteredGridlen) + (curYearlyInvestment[a] / filteredGridlen)
                                     });
                                     investGrid.properties.investment = newYearlyInvestment;
 
@@ -82,16 +82,16 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     var curYearlyIncome = curData.income;
                                     var newYearlyIncome = {};
                                     Object.keys(origYearlyIncome).map(function(a) {
-                                        newYearlyIncome[a] = origYearlyIncome[a] + curYearlyIncome[a]
+                                        newYearlyIncome[a] = (origYearlyIncome[a] / filteredGridlen) + (curYearlyIncome[a] / filteredGridlen)
                                     });
                                     incGrid.properties.income = newYearlyIncome;
 
 
                                     var origYearlyMaintainence = maintGrid.properties.income;
-                                    var curYearlyMaintainence = curData.income;
+                                    var curYearlyMaintainence = curData.maintainence;
                                     var newYearlyMaintainence = {};
                                     Object.keys(origYearlyMaintainence).map(function(a) {
-                                        newYearlyMaintainence[a] = origYearlyMaintainence[a] + curYearlyMaintainence[a]
+                                        newYearlyMaintainence[a] = (origYearlyMaintainence[a] / filteredGridlen) + (curYearlyMaintainence[a] / filteredGridlen)
                                     });
                                     maintGrid.properties.maintainence = newYearlyMaintainence;
 
