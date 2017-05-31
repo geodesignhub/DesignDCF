@@ -58,73 +58,90 @@
         <!-- Heading Row -->
 
         <div class="row">
-             <div class="col-md-6">
-                <h3>Design Synthesis</h3>
-                <div id="inputmap"></div>
-            </div> 
             <div class="col-md-6">
                 <h3 id="designName">Discounted Cash Flow Analysis</h3>
                 <p class="description">This plugin downloads a design from Geodesign Hub, computes its area and construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow" target="_blank">Discounted Cash Flow</a> analysis to calculate Net
                     Present Value of this design. Choose the WACC and click on Compute Net Present Value, then you can copy paste it in Excel.</p><br><br>
             </div>
-        </div>
-        <div class="row">
-            <!-- <div class="col-md-6">
-                <h3>Design Synthesis</h3>
-                <div id="inputmap"></div>
-            </div> -->
-            <div class="col-md-6">
 
+            <div class="col-md-6 text-right">
+                <!--<h3>Design Synthesis</h3>
+                <div id="inputmap"></div>-->
                 <h5>Weighted Annual Cost of Capital (WACC)</h5>
                 <p class='ionslider'><input type="text" id="wacc-slider" name="wacc" value="" /></p>
+                <br><br><br><br>
                 <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button>&nbsp;&nbsp;<span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
                 </p>
+                <br>
 
-
-            </div>
-
-            <div class="col-md-6">
-            
                 <div id="systemsCBCont" style="display:none">
                     <h4>Systems</h4>
                     <div id="systemsCB"></div>
                 </div>
             </div>
-               
+        </div>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6 text-right">
+
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                    <input type="radio" name="mapdisplay" value="total" checked="">Total
+                </label>
+                    <label class="btn btn-default">
+                    <input type="radio" name="mapdisplay" value="yearly" >Yearly
+                </label>
+                </div>
+            </div>
+
         </div>
 
         <br>
         <div class="row">
-        <div class="col-md-4">
-            <h4>Investment Map</h4>
-            <div id="investmentMap" class="map"></div>
+            <div class="col-md-4">
+                <h4>Investments Map</h4>
+                <div id="investmentMap" class="map"></div>
+            </div>
+            <div class="col-md-4">
+                <h4>Income Map</h4>
+                <div id="incomeMap" class="map"></div>
+            </div>
+            <div class="col-md-4">
+                <h4>Maintainence Map</h4>
+                <div id="maintainenceMap" class="map"></div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h4>Income Map</h4>
-            <div id="incomeMap" class="map"></div>
-        </div>
-        <div class="col-md-4">
-            <h4>Maintainence Map</h4>
-            <div id="maintainenceMap" class="map"></div>
-        </div>
+        <div class="row">
+            <div class="col-md-6">
+
+            </div>
+            <div class="col-md-6">
+                <div id="yearlySliderCont" style="display:none"><br>
+                    <p class='ionslider'><input type="text" id="yearly-slider" name="mapslider" value="" /></p>
+                </div>
+            </div>
         </div>
         <br>
         <hr>
         <br>
         <div class="row">
             <div class="col-md-6">
-                
+                <h3>Profit and Loss Statement</h3>
+                <br>
+                <br>
             </div>
 
             <div class="col-md-6 text-right">
                 <div class="btn-group" data-toggle="buttons">
-
-                    <label class="btn btn-default">
-                    <input type="radio" name="pprintdisplay" value="raw">Raw
-                </label>
                     <label class="btn btn-default active">
-                    <input type="radio" name="pprintdisplay" value="pprint" checked="">Pretty Print
-                </label>
+                        <input type="radio" name="pprintdisplay" value="pprint" checked="">Pretty Print
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="pprintdisplay" value="raw">Raw
+                    </label>
                 </div>
             </div>
         </div>
@@ -349,26 +366,26 @@
         var bounds = <%- bounds %>;
         var investmentdata;
         var overallgrid;
-        var diaggrid; 
+        var diaggrid;
 
         var startyear = moment(projectdetails['startdate']).year();
 
-        var inputmap = L.map('inputmap', {
-            'zoomControl': false,
-            'dragging': false,
-            'touchZoom': false,
-            'scrollWheelZoom': false,
-            'doubleClickZoom': false
-        });
-        var inputbaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-            maxZoom: 18,
-        }).addTo(inputmap);
-        var inputLayer = L.featureGroup().addTo(inputmap);
-        var diagramLayer = L.geoJSON(design, {
-            style: miniMapstyleComp
-        }).addTo(inputLayer);
-        inputmap.fitBounds(inputLayer.getBounds());
+        // var inputmap = L.map('inputmap', {
+        //     'zoomControl': false,
+        //     'dragging': false,
+        //     'touchZoom': false,
+        //     'scrollWheelZoom': false,
+        //     'doubleClickZoom': false
+        // });
+        // var inputbaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+        //     maxZoom: 18,
+        // }).addTo(inputmap);
+        // var inputLayer = L.featureGroup().addTo(inputmap);
+        // var diagramLayer = L.geoJSON(design, {
+        //     style: miniMapstyleComp
+        // }).addTo(inputLayer);
+        // inputmap.fitBounds(inputLayer.getBounds());
 
 
         function abbrNum(number, decPlaces) {
@@ -589,6 +606,14 @@
                 from: 1,
                 step: 0.5,
                 postfix: "%",
+                grid: true,
+                prettify_enabled: true
+            });
+            $("#yearly-slider").ionRangeSlider({
+                min: startyear,
+                max: startyear + 15,
+                from: startyear,
+                step: 1,
                 grid: true,
                 prettify_enabled: true
             });
@@ -907,7 +932,7 @@
             }, false);
 
         }
-         var incomemap = L.map('incomeMap', {
+        var incomemap = L.map('incomeMap', {
             'zoomControl': false,
             'dragging': false,
             'touchZoom': false,
@@ -919,9 +944,9 @@
             maxZoom: 18,
         }).addTo(incomemap);
         var incomeLayer = L.featureGroup().addTo(incomemap);
-        
 
-         var investmentmap = L.map('investmentMap', {
+
+        var investmentmap = L.map('investmentMap', {
             'zoomControl': false,
             'dragging': false,
             'touchZoom': false,
@@ -936,7 +961,7 @@
 
 
 
-         var maintainencemap = L.map('maintainenceMap', {
+        var maintainencemap = L.map('maintainenceMap', {
             'zoomControl': false,
             'dragging': false,
             'touchZoom': false,
@@ -960,62 +985,63 @@
         investmentmap.fitBounds(mB);
         maintainencemap.fitBounds(mB);
 
-        function plotIncomeMap(incomeGrid){
+        function plotIncomeMap(incomeGrid) {
             L.choropleth(incomeGrid, {
                 valueProperty: 'totalIncome',
-                scale: ['white', 'green'],
+                scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
                 steps: 5,
                 mode: 'e',
                 style: {
-                color: '#fff',
-                weight: 2,
-                fillOpacity: 0.8
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
                 },
-                onEachFeature: function (feature, layer) {
-                layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    feature.properties.totalIncome.toLocaleString() + ' incidents')
+                onEachFeature: function(feature, layer) {
+                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        feature.properties.totalIncome.toLocaleString() + ' incidents')
                 }
             }).addTo(incomeLayer);
 
         }
 
-        function plotInvestmentMap(investmentGrid){
+        function plotInvestmentMap(investmentGrid) {
             L.choropleth(investmentGrid, {
                 valueProperty: 'totalInvestment',
-                scale: ['white', 'red'],
+                scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
                 steps: 5,
                 mode: 'e',
                 style: {
-                color: '#fff',
-                weight: 2,
-                fillOpacity: 0.8
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
                 },
-                onEachFeature: function (feature, layer) {
-                layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    feature.properties.totalInvestment.toLocaleString() + ' incidents')
+                onEachFeature: function(feature, layer) {
+                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        feature.properties.totalInvestment.toLocaleString() + ' incidents')
                 }
             }).addTo(investmentLayer);
 
         }
 
-        function plotMaintainenceMap(maintainenceGrid){
+        function plotMaintainenceMap(maintainenceGrid) {
             L.choropleth(maintainenceGrid, {
                 valueProperty: 'totalMaintainence',
-                scale: ['white', 'blue'],
+                scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
                 steps: 5,
                 mode: 'e',
                 style: {
-                color: '#fff',
-                weight: 2,
-                fillOpacity: 0.8
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
                 },
-                onEachFeature: function (feature, layer) {
-                layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    feature.properties.totalMaintainence.toLocaleString() + ' incidents')
+                onEachFeature: function(feature, layer) {
+                    layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        feature.properties.totalMaintainence.toLocaleString() + ' incidents')
                 }
             }).addTo(maintainenceLayer);
 
         }
+
         function populateIncomeInvestment(investmentdata, pprint) {
             for (var g = 0; g < investmentdata.length; g++) {
                 var curInvestmentdata = investmentdata[g];
@@ -1240,7 +1266,17 @@
         }
         $('input:radio[name="pprintdisplay"]').change(function(event) {
             populateTableDataInit();
+        });
 
+
+        $('input:radio[name="mapdisplay"]').change(function(event) {
+
+            var checked = $('input:radio[name="mapdisplay"]:checked').val();
+            if (checked == 'total') {
+                $("#yearlySliderCont").hide();
+            } else {
+                $("#yearlySliderCont").show();
+            }
         });
 
         function generateSystemCB(systems) {

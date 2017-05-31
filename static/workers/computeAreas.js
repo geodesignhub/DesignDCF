@@ -38,20 +38,22 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
                     var curFeat = curDiag.features[b];
                     var curDiagbounds = turf.bbox(curFeat);
                     var cData = gridTree.bbox([curDiagbounds[0], curDiagbounds[1]], [curDiagbounds[2], curDiagbounds[3]]); // array of features
+
                     for (var g1 = 0; g1 < cData.length; g1++) {
                         var curIFeatGrid = cData[g1];
                         var curIFeatGridID = curIFeatGrid.properties.id;
                         curGridIntersects.push(curIFeatGridID);
                         const allReadyExists = addedIDs.includes(curIFeatGridID);
                         sysAddedIDs.push(curIFeatGridID);
+                        diagAddedIDs.push(curIFeatGridID);
                         if (allReadyExists) {} else {
                             addedIDs.push(curIFeatGridID);
-                            diagAddedIDs.push(curIFeatGridID);
                             relevantGrid.features.push(curIFeatGrid);
                         }
                     }
 
                 }
+
                 diagGrids[diagID] = diagAddedIDs;
             }
         }
