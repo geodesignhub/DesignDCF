@@ -73,11 +73,6 @@
                 <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button>&nbsp;&nbsp;<span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
                 </p>
                 <br>
-
-                <div id="systemsCBCont" style="display:none">
-                    <h4>Systems</h4>
-                    <div id="systemsCB"></div>
-                </div>
             </div>
         </div>
         <br>
@@ -129,7 +124,7 @@
         <br>
         <div class="row">
             <div class="col-md-6">
-                <h3>Profit and Loss Statement</h3>
+                <h3>Financial Statement</h3>
                 <br>
                 <br>
             </div>
@@ -142,6 +137,14 @@
                     <label class="btn btn-default">
                         <input type="radio" name="pprintdisplay" value="raw">Raw
                     </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="systemsCBCont" style="display:none">
+                    <h4>Systems</h4>
+                    <div id="systemsCB"></div>
                 </div>
             </div>
         </div>
@@ -275,6 +278,7 @@
         var svgDrawing = SVG('drawing').size(10, 10);
         fx.base = "USD";
         var incomeGrid;
+        var standardizationVar;
         var maintainenceGrid;
         var investmentGrid;
         var numYears = 17; // number of colums; 
@@ -617,11 +621,11 @@
                 step: 1,
                 grid: true,
                 prettify_enabled: true,
-                onFinish: function (data) {
+                onFinish: function(data) {
                     var tY = parseInt($("#yearly-slider").val());
-                    plotIncomeMap(incomeGrid,tY);
-                    plotInvestmentMap(investmentGrid, tY);
-                    plotMaintainenceMap(maintainenceGrid, tY);
+                    plotIncomeMap(incomeGrid, tY, standardizationVar);
+                    plotInvestmentMap(investmentGrid, tY, standardizationVar);
+                    plotMaintainenceMap(maintainenceGrid, tY, standardizationVar);
                 }
             });
         }
@@ -890,8 +894,8 @@
                 } else {
                     var raworpp = $('input:radio[name="pprintdisplay"]:checked').val();
                     var pprint = (raworpp == 'raw') ? 0 : 1;
-
-                    populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all','all');
+                    standardizationVar = parseInt(e.data.maxYearlyCost);
+                    populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all', 'all', parseInt(e.data.maxYearlyCost));
                     investmentdata = JSON.parse(e.data.output);
                     showallTables();
                     populateIncomeInvestment(investmentdata, pprint);
@@ -904,7 +908,7 @@
 
         }
 
-        function populateMaps(grid, sysGridIDs, diagGridIDs, idata, selectedsystems, totalorYearly) {
+        function populateMaps(grid, sysGridIDs, diagGridIDs, idata, selectedsystems, totalorYearly, stdVar) {
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
@@ -931,9 +935,9 @@
                     incomeGrid = JSON.parse(e.data.incomeGrid);
                     investmentGrid = JSON.parse(e.data.investmentGrid);
                     maintainenceGrid = JSON.parse(e.data.maintainenceGrid);
-                    plotIncomeMap(incomeGrid,totalorYearly);
-                    plotInvestmentMap(investmentGrid,totalorYearly);
-                    plotMaintainenceMap(maintainenceGrid,totalorYearly);
+                    plotIncomeMap(incomeGrid, totalorYearly, stdVar);
+                    plotInvestmentMap(investmentGrid, totalorYearly, stdVar);
+                    plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
                     // paint on map.
                 }
             }, false);
@@ -992,17 +996,17 @@
         investmentmap.fitBounds(mB);
         maintainencemap.fitBounds(mB);
 
-        function plotIncomeMap(incomeGrid, yearlyOrTotal) {
-            
+        function plotIncomeMap(incomeGrid, yearlyOrTotal, stdVar) {
+
             incomeLayer.clearLayers();
-            if (yearlyOrTotal === 'all'){
+            if (yearlyOrTotal === 'all') {
 
                 L.choropleth(incomeGrid, {
-                    valueProperty: 'totalIncome' , 
+                    valueProperty: 'totalIncome',
                     // scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
                     scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
-                    mode: 'e',
+                    mode: 'q',
                     style: {
                         color: '#fff',
                         weight: 2,
@@ -1011,51 +1015,52 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalIncome.toLocaleString() + ' incidents');
-                        var ps = feature.properties.totalIncome.toLocaleString(); 
+                        var ps = feature.properties.totalIncome.toLocaleString();
                         layer.bindPopup(ps);
                     }
                 }).addTo(incomeLayer);
-            }
-
-            else {
-            L.choropleth(incomeGrid, {
-                valueProperty: function (feature) {
-                    return feature.properties.income[yearlyOrTotal]
-                },
-                // scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
-                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                steps: 5,
-                mode: 'e',
-                style: {
-                    color: '#fff',
-                    weight: 2,
-                    fillOpacity: 0.8
-                },
-                onEachFeature: function(feature, layer) {
-                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    //     feature.properties.totalIncome.toLocaleString() + ' incidents');
-                    var ps = (feature.properties.income[parseInt(yearlyOrTotal)])? feature.properties.income[parseInt(yearlyOrTotal)].toLocaleString() : "0";
-                    layer.bindPopup(ps);
-                }
-            }).addTo(incomeLayer);
+            } else {
+                L.choropleth(incomeGrid, {
+                    valueProperty: function(feature) {
+                        var i = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[parseInt(yearlyOrTotal)] : 0;
+                        i = (i / stdVar) * 100;
+                        // console.log("income: " + i);
+                        return i
+                    },
+                    // scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'q',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalIncome.toLocaleString() + ' incidents');
+                        var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                        layer.bindPopup(ps);
+                    }
+                }).addTo(incomeLayer);
 
             }
 
 
         }
 
-        function plotInvestmentMap(investmentGrid,yearlyOrTotal) {
+        function plotInvestmentMap(investmentGrid, yearlyOrTotal, stdVar) {
             investmentLayer.clearLayers();
 
             // var plotValue = (yearlyOrTotal === 'all') ? 'totalInvestment': yearlyOrTotal;
-            if (yearlyOrTotal === 'all'){
+            if (yearlyOrTotal === 'all') {
 
                 L.choropleth(investmentGrid, {
-                    valueProperty:  'totalInvestment' ,
+                    valueProperty: 'totalInvestment',
                     // scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
                     scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
-                    mode: 'e',
+                    mode: 'q',
                     style: {
                         color: '#fff',
                         weight: 2,
@@ -1065,17 +1070,19 @@
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = feature.properties.totalInvestment.toLocaleString();
-                                   
+
                         layer.bindPopup(ps);
 
                     }
                 }).addTo(investmentLayer);
-            }
-            else{
+            } else {
 
                 L.choropleth(investmentGrid, {
-                    valueProperty:  function (feature) {
-                        return feature.properties.investment[yearlyOrTotal]
+                    valueProperty: function(feature) {
+                        var i = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)] : 0;
+                        i = (i / stdVar) * 100;
+                        // console.log("investment: " + i);
+                        return i
                     },
                     // scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
                     scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
@@ -1089,8 +1096,8 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
-                        var ps = (feature.properties.investment[parseInt(yearlyOrTotal)])? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : "0";
-                                          
+                        var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+
                         layer.bindPopup(ps);
 
                     }
@@ -1098,56 +1105,58 @@
             }
         }
 
-        function plotMaintainenceMap(maintainenceGrid,yearlyOrTotal) {
+        function plotMaintainenceMap(maintainenceGrid, yearlyOrTotal, stdVar) {
             maintainenceLayer.clearLayers();
-            var plotValue = (yearlyOrTotal === 'all') ? 'totalMaintainence': yearlyOrTotal;
-            if (yearlyOrTotal === 'all')  {
+            var plotValue = (yearlyOrTotal === 'all') ? 'totalMaintainence' : yearlyOrTotal;
+            if (yearlyOrTotal === 'all') {
 
-            L.choropleth(maintainenceGrid, {
-                valueProperty: 'totalMaintainence',
-                // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+                L.choropleth(maintainenceGrid, {
+                    valueProperty: 'totalMaintainence',
+                    // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
 
-                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                steps: 5,
-                mode: 'e',
-                style: {
-                    color: '#fff',
-                    weight: 2,
-                    fillOpacity: 0.8
-                },
-                onEachFeature: function(feature, layer) {
-                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                    var ps = feature.properties.totalMaintainence.toLocaleString();
-                           
-                    layer.bindPopup(ps);
-
-                }
-            }).addTo(maintainenceLayer);
-            } 
-            else {
-            L.choropleth(maintainenceGrid, {
-                    valueProperty:  function (feature) {
-                        return feature.properties.investment[yearlyOrTotal]
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'q',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
                     },
-                // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+                        var ps = feature.properties.totalMaintainence.toLocaleString();
 
-                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                steps: 5,
-                mode: 'e',
-                style: {
-                    color: '#fff',
-                    weight: 2,
-                    fillOpacity: 0.8
-                },
-                onEachFeature: function(feature, layer) {
-                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                    //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                    var ps= (feature.properties.maintainence[parseInt(yearlyOrTotal)])? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : "0";              
-                    layer.bindPopup(ps);
+                        layer.bindPopup(ps);
 
-                }
-            }).addTo(maintainenceLayer);
+                    }
+                }).addTo(maintainenceLayer);
+            } else {
+                L.choropleth(maintainenceGrid, {
+                    valueProperty: function(feature) {
+                        var m = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties.maintainence[parseInt(yearlyOrTotal)] : 0;
+                        m = (m / stdVar) * 100;
+                        // console.log("maintainence: " + m);
+                        return (-1 * m)
+                    },
+                    // scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+
+                    scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                    steps: 5,
+                    mode: 'e',
+                    style: {
+                        color: '#fff',
+                        weight: 2,
+                        fillOpacity: 0.8
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                        //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+                        var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                        layer.bindPopup(ps);
+
+                    }
+                }).addTo(maintainenceLayer);
 
             }
         }
@@ -1384,12 +1393,12 @@
             var checked = $('input:radio[name="mapdisplay"]:checked').val();
             if (checked == 'total') {
                 $("#yearlySliderCont").hide();
-                plotIncomeMap(incomeGrid, 'all');
-                plotMaintainenceMap(maintainenceGrid,'all');
-                plotInvestmentMap(investmentGrid, 'all');
+                plotIncomeMap(incomeGrid, 'all', standardizationVar);
+                plotMaintainenceMap(maintainenceGrid, 'all', standardizationVar);
+                plotInvestmentMap(investmentGrid, 'all', standardizationVar);
             } else {
                 $("#yearlySliderCont").show();
-                
+
             }
         });
 
@@ -1403,7 +1412,6 @@
                 var selectedsystems = [];
                 $('#systemsCB input:checked').each(function() {
                     selectedsystems.push($(this).attr('id'));
-
                 });
                 // switch yearly
                 // TODO: click on the yearly switch

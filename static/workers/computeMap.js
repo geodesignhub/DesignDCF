@@ -86,8 +86,7 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     });
                                     incGrid.properties.income = newYearlyIncome;
 
-
-                                    var origYearlyMaintainence = maintGrid.properties.income;
+                                    var origYearlyMaintainence = maintGrid.properties.maintainence;
                                     var curYearlyMaintainence = curData.maintainence;
                                     var newYearlyMaintainence = {};
                                     Object.keys(origYearlyMaintainence).map(function(a) {

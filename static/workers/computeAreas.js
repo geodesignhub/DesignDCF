@@ -7,8 +7,10 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
     var startyear = parseInt(startyear);
+    var maxYearlyCost = 0;
     diagCosts = [];
     var gridTree = RTree();
+
     gridTree.geoJSON(grid);
 
     var syslen = systems.length;
@@ -110,6 +112,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
             curDiagDetails['income'] = {};
             curDiagDetails['maintainence'] = {};
             yearlyCost = parseFloat(totalCost / numYears);
+            maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;
+            // console.log(maxYearlyCost);
 
             var tenpercentIncome = yearlyCost * 0.1;
             // for the relevant intersects add income to that  cell for that year. 
@@ -125,11 +129,11 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
             var lastIncome;
             for (var k4 = 0; k4 < numYears; k4++) {
                 if (k4 < 19) {
-                    var incomeIncrease = (tenpercentIncome * 0.03);
-                    var newIncome = incomeIncrease + lastIncome;
+                    // var incomeIncrease = (tenpercentIncome * 0.03);
+                    // var newIncome = incomeIncrease + lastIncome;
                     var sYear = (startyear + k4);
                     curDiagDetails['investment'][sYear] = yearlyCost;
-                    lastIncome = newIncome;
+                    // lastIncome = newIncome;
                 }
             }
             var totalIncome = 0;
@@ -168,7 +172,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
         'sysGrids': JSON.stringify(sysGrids),
         'diagGrids': JSON.stringify(diagGrids),
         'grid': JSON.stringify(relevantGrid),
-        'output': JSON.stringify(diagCosts)
+        'output': JSON.stringify(diagCosts),
+        'maxYearlyCost': maxYearlyCost
     });
 }
 
