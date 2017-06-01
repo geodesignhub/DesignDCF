@@ -419,7 +419,7 @@
             $("#loadingGIF").show();
 
             populateTableDataInit();
-            $("#loadingGIF").hide();
+            // $("#loadingGIF").hide();
         });
         var selectedcurrency = $("#workingcurrency :selected").val() + " ";
         $("#workingcurrency").on('change', function() {
@@ -902,7 +902,6 @@
                     computeDCFNPV(investmentdata, pprint);
                     generateSystemCB(systemdetail);
                     $('#systemsCBCont').show();
-                    $("#loadingGIF").hide();
                 }
             }, false);
 
@@ -942,6 +941,7 @@
                 }
             }, false);
 
+            $("#loadingGIF").hide();
         }
         var incomemap = L.map('incomeMap', {
             'zoomControl': false,
