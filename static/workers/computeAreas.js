@@ -197,7 +197,7 @@ function generateGrid(bounds, startyear, systems) {
         return parseFloat(item, 10);
     });
     // 1 hectare grid
-    var g = turf.squareGrid(bounds, 0.1, 'kilometers');
+    var g = turf.squareGrid(bounds, 1, 'kilometers');
     var grid = { "type": "FeatureCollection", "features": [] };
     var gridlen = g.features.length;
     // var initCosts = [];
