@@ -175,6 +175,9 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
         'output': JSON.stringify(diagCosts),
         'maxYearlyCost': maxYearlyCost
     });
+
+    // close the worker
+    self.close();
 }
 
 function generateGrid(bounds, startyear, systems) {

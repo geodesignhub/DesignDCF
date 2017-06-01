@@ -155,6 +155,9 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
         'maintainenceGrid': JSON.stringify(maintainenceGrid),
         'dcfgrid': JSON.stringify(dcfGrid)
     });
+
+    // close the worker
+    self.close();
 }
 
 
