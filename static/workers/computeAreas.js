@@ -197,7 +197,18 @@ function generateGrid(bounds, startyear, systems) {
         return parseFloat(item, 10);
     });
     // 1 hectare grid
-    var g = turf.squareGrid(bounds, 0.1, 'kilometers');
+    // 1 hectare is 10000 sq m. 
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+    var poly = turf.bboxPolygon(bounds);
+    var area = parseInt(turf.area(poly));
+    var length = Math.sqrt(area);
+    // grid of 25 x 25
+    var numberofgridcells = 25;
+    var gridsize = (length / numberofgridcells) / 1000;
+    gridsize = round(gridsize, 2);
+    var g = turf.squareGrid(bounds, gridsize, 'kilometers');
     var grid = { "type": "FeatureCollection", "features": [] };
     var gridlen = g.features.length;
     // var initCosts = [];
