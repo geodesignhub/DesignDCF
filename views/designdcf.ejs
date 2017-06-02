@@ -281,6 +281,9 @@
         var standardizationVar;
         var maintainenceGrid;
         var investmentGrid;
+        var grid; var sysGrids;
+        var diagGrids;
+
         var numYears = 17; // number of colums; 
         function miniMapstyleComp(feature) {
             // console.log(feature.properties)
@@ -895,6 +898,9 @@
                     var raworpp = $('input:radio[name="pprintdisplay"]:checked').val();
                     var pprint = (raworpp == 'raw') ? 0 : 1;
                     standardizationVar = parseInt(e.data.maxYearlyCost);
+                    grid = JSON.parse(e.data.grid);
+                    sysGrids = JSON.parse(e.data.sysGrids);
+                    diagGrids = JSON.parse(e.data.diagGrids);
                     populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all', 'all', parseInt(e.data.maxYearlyCost));
                     investmentdata = JSON.parse(e.data.output);
                     showallTables();
@@ -937,6 +943,51 @@
                     plotIncomeMap(incomeGrid, totalorYearly, stdVar);
                     plotInvestmentMap(investmentGrid, totalorYearly, stdVar);
                     plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
+                    // paint on map.
+                }
+            }, false);
+
+            $("#loadingGIF").hide();
+        }
+
+        function updateMaps() {
+            var selectedsystems = [];
+            
+                
+                $('#systemsCB input:checked').each(function() {
+                    selectedsystems.push($(this).attr('id'));
+                });
+           
+
+            var mapWorker = new Worker('/assets/workers/computeMap.js');
+            mapWorker.onerror = function(e) {
+                console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
+                $("#loadingGIF").hide();
+                humane.log("There was a error in creating maps, please try again.. ", {
+                    addnCls: 'humane-flatty-log'
+                });
+
+            };
+
+            // console.log(selectedsystems);
+            mapWorker.postMessage({
+                'grid': JSON.stringify(grid),
+                'sysGrid': JSON.stringify(sysGrids),
+                'diagGrid': JSON.stringify(diagGrids),
+                'investmentdata': JSON.stringify(investmentdata),
+                'selectedsystems': JSON.stringify(selectedsystems)
+            });
+            mapWorker.addEventListener('message', function(e) {
+                if (e.data.mode === 'status') {
+                    updateWorkerStatus(e.data.percentcomplete);
+                } else {
+                    // console.log(e.data.incomeGrid);
+                    var incg = JSON.parse(e.data.incomeGrid);
+                    var invg = JSON.parse(e.data.investmentGrid);
+                    var maintg = JSON.parse(e.data.maintainenceGrid);
+                    plotIncomeMap(incg, 'all', standardizationVar);
+                    plotInvestmentMap(invg, 'all', standardizationVar);
+                    plotMaintainenceMap(maintg, 'all', standardizationVar);
                     // paint on map.
                 }
             }, false);
@@ -1002,7 +1053,13 @@
             if (yearlyOrTotal === 'all') {
 
                 L.choropleth(incomeGrid, {
-                    valueProperty: 'totalIncome',
+                    valueProperty: function(feature) {
+                        var m = feature.properties.totalIncome;
+                        m = (m / stdVar) * 100;
+                        
+                        return m;                
+                        },
+                    
                     scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
@@ -1057,7 +1114,12 @@
             if (yearlyOrTotal === 'all') {
 
                 L.choropleth(investmentGrid, {
-                    valueProperty: 'totalInvestment',
+                    valueProperty:function(feature) {
+                        var i = feature.properties.totalInvestment;
+                        i = (i / stdVar) * 100;
+                        // console.log("investment: " + i);
+                        return i
+                    }, 
                     scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
@@ -1113,7 +1175,12 @@
             if (yearlyOrTotal === 'all') {
 
                 L.choropleth(maintainenceGrid, {
-                    valueProperty: 'totalMaintainence',
+                    valueProperty: function(feature) {
+                        var m = feature.properties.totalMaintainence;
+                        m = (m / stdVar) * 100;
+                        
+                        return (-1 * m)
+                    },
                     scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
@@ -1191,9 +1258,9 @@
 
                 var totalMaint = curInvestmentdata['maintainence']['total'];
                 if (pprint) {
-
                     var abstotalMaint = Math.abs(totalMaint);
-                    totalMaint = '(' + abbrNum(abstotalMaint, 1) + ')';
+                    // totalMaint = '(' + abbrNum(abstotalMaint, 1) + ')';
+                    totalMaint = abbrNum(abstotalMaint, 1);
                 } else {
                     totalMaint = parseFloat(totalMaint).toFixed(2);
                 }
@@ -1228,7 +1295,8 @@
                     var yearlyMaintainence = 0;
                     var absMaint = Math.abs(cMaint[currentYear]);
                     if (pprint) {
-                        yearlyMaintainence = '(' + abbrNum(absMaint, 1) + ')';
+                        // yearlyMaintainence = '(' + abbrNum(absMaint, 1) + ')';
+                        yearlyMaintainence = abbrNum(absMaint, 1);
                     } else {
                         yearlyMaintainence = parseFloat(cMaint[currentYear]).toFixed(2);
                     }

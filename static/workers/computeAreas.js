@@ -152,7 +152,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
             }
             curDiagDetails['income']['total'] = totalIncome;
             var totalMaintainence = 0;
-            var threepercentMaintainece = -1 * yearlyCost * 0.03;
+            // var threepercentMaintainece = -1 * yearlyCost * 0.03;
+            var threepercentMaintainece = yearlyCost * 0.03;
             var lastIncome;
             for (var k7 = 0; k7 < 20; k7++) {
                 if (k7 < 19) {
