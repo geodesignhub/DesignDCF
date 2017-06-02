@@ -1015,7 +1015,7 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalIncome.toLocaleString() + ' incidents');
-                        var ps = feature.properties.totalIncome.toLocaleString();
+                        var ps = abbrNum(feature.properties.totalIncome,2);
                         layer.bindPopup(ps);
                     }
                 }).addTo(incomeLayer);
@@ -1039,7 +1039,8 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalIncome.toLocaleString() + ' incidents');
-                        var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                        var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[parseInt(yearlyOrTotal)] : 0;
+                        ps = abbrNum(ps, 2);
                         layer.bindPopup(ps);
                     }
                 }).addTo(incomeLayer);
@@ -1069,7 +1070,7 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
-                        var ps = feature.properties.totalInvestment.toLocaleString();
+                        var ps = abbrNum(feature.properties.totalInvestment, 2);
 
                         layer.bindPopup(ps);
 
@@ -1096,7 +1097,8 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
-                        var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : "0";
+                        var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : 0;
+                        ps = abbrNum(p2,2);
 
                         layer.bindPopup(ps);
 
@@ -1124,9 +1126,12 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                        var ps = feature.properties.totalMaintainence.toLocaleString();
+                        var ps = feature.properties.totalMaintainence;
+                        // console.log(ps);
+                        ps = Math.abs(ps);
+                        ps = abbrNum(ps, 2);
 
-                        layer.bindPopup(ps);
+                        layer.bindPopup("-"+ ps);
 
                     }
                 }).addTo(maintainenceLayer);
@@ -1150,8 +1155,11 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                        var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : "0";
-                        layer.bindPopup(ps);
+                        var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : 0;
+                        // console.log(ps);
+                        ps = Math.abs(ps);
+                        ps = abbrNum(ps,2);
+                        layer.bindPopup("-" + ps);
 
                     }
                 }).addTo(maintainenceLayer);

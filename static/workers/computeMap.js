@@ -106,7 +106,6 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     maintGrid = curGrid;
                                     maintGrid.properties.maintainence = yearlyMaintainence;
                                     maintGrid.properties.totalMaintainence = (yearlyMaintainence['total'] / filteredGridlen);
-
                                 }
 
                                 addedIDs.push(curGridID);

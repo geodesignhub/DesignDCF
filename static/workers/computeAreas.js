@@ -208,7 +208,7 @@ function generateGrid(bounds, startyear, systems) {
     var numberofgridcells = 25;
     var gridsize = (length / numberofgridcells) / 1000;
     gridsize = round(gridsize, 2);
-    console.log(gridsize);
+    // console.log(gridsize);
     var g = turf.squareGrid(bounds, gridsize, 'kilometers');
     var grid = { "type": "FeatureCollection", "features": [] };
     var gridlen = g.features.length;
