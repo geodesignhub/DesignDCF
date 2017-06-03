@@ -82,12 +82,12 @@
             </div>
             <div class="col-md-6 text-right">
 
-                <div class="btn-group" data-toggle="buttons">
+                <div id='yearlyortotal' class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default active">
-                    <input type="radio" name="mapdisplay" value="total" checked="">Total
+                    <input type="radio" id='totalmap' name="mapdisplay" value="total" checked="">Total
                 </label>
                     <label class="btn btn-default">
-                    <input type="radio" name="mapdisplay" value="yearly" >Yearly
+                    <input type="radio" id= 'yearlymap' name="mapdisplay" value="yearly" >Yearly
                 </label>
                 </div>
             </div>
@@ -1489,7 +1489,9 @@
                 });
                 // switch yearly
                 // TODO: click on the yearly switch
+
                 // TODO: update maps for system. 
+                updateMaps();
                 // hide rest from map, 
                 $('#investments > tbody > tr').each(function() {
                     var cls = $(this).attr('class');
