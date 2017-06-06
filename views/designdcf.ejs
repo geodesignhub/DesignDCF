@@ -994,11 +994,12 @@
                     plotIncomeMap(incg, 'all', standardizationVar);
                     plotInvestmentMap(invg, 'all', standardizationVar);
                     plotMaintainenceMap(maintg, 'all', standardizationVar);
+
+                    $("#loadingGIF").hide();
                     // paint on map.
                 }
             }, false);
 
-            $("#loadingGIF").hide();
         }
         var incomemap = L.map('incomeMap', {
             'zoomControl': false,
@@ -1495,7 +1496,7 @@
                 });
                 // switch yearly
                 // TODO: click on the yearly switch
-                $("#loadingGIF").show();
+                // $("#loadingGIF").show();
                 // TODO: update maps for system. 
                 updateMaps();
                 // hide rest from map, 
