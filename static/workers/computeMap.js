@@ -25,7 +25,8 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
     var finalMaintainenceGrid = {};
     var finalIncomeGrid = {};
     var finaldcfGrid = {};
-
+    var fullproc = Object.keys(sysGrid).length;
+    var counter = 0;
     for (var sysid in sysGrid) { // iterate over the systems. 
         if ((selectedsystems == 'all') || (selectedsystems.includes(sysid))) { // this system is in the filtered list. 
             if (sysGrid.hasOwnProperty(parseInt(sysid))) {
@@ -118,6 +119,12 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                 }
             }
         }
+
+        counter += 1;
+        self.postMessage({
+            'percentcomplete': parseInt((100 * counter) / fullproc),
+            'mode': 'status',
+        });
     }
 
     // console.log(JSON.stringify(finalInvestmentGrid));

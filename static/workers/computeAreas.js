@@ -2,7 +2,7 @@ importScripts('../js/turf.min.js');
 importScripts('../js/moment.min.js');
 importScripts('../js/rtree.min.js');
 
-function computeAreas(systemdetails, systems, timeline, startyear, grid) {
+function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize) {
     var systemdetails = JSON.parse(systemdetails);
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
@@ -10,7 +10,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
     var maxYearlyCost = 0;
     diagCosts = [];
     var gridTree = RTree();
-
+    var grid = gridgridsize[0];
+    var gridsize = gridgridsize[1];
     gridTree.geoJSON(grid);
 
     var syslen = systems.length;
@@ -174,7 +175,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, grid) {
         'diagGrids': JSON.stringify(diagGrids),
         'grid': JSON.stringify(relevantGrid),
         'output': JSON.stringify(diagCosts),
-        'maxYearlyCost': maxYearlyCost
+        'maxYearlyCost': maxYearlyCost,
+        'gridsize': gridsize
     });
 
     // close the worker
@@ -235,10 +237,10 @@ function generateGrid(bounds, startyear, systems) {
         grid.features.push(curgrid);
     }
 
-    return grid;
+    return [grid, gridsize];
 
 }
 self.onmessage = function(e) {
-    grid = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
-    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, grid);
+    gridgridsize = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
+    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize);
 }

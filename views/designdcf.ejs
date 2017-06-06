@@ -70,7 +70,8 @@
                 <h5>Weighted Annual Cost of Capital (WACC)</h5>
                 <p class='ionslider'><input type="text" id="wacc-slider" name="wacc" value="" /></p>
                 <br><br><br><br>
-                <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button>&nbsp;&nbsp;<span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
+                <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button></p>
+                <p><span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
                 </p>
                 <br>
             </div>
@@ -111,7 +112,7 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-
+                <p><small id="gridsizecont"></small></p>
             </div>
             <div class="col-md-6">
                 <div id="yearlySliderCont" style="display:none"><br>
@@ -281,7 +282,8 @@
         var standardizationVar;
         var maintainenceGrid;
         var investmentGrid;
-        var grid; var sysGrids;
+        var grid;
+        var sysGrids;
         var diagGrids;
 
         var numYears = 17; // number of colums; 
@@ -359,7 +361,7 @@
                 type === 'boundaries2' ? '#b2df8a' :
                 '#808080';
         }
-        $("#loadingGIF").hide();
+        // $("#loadingGIF").hide();
         var opGJ = {
             "type": "FeatureCollection",
             "features": []
@@ -420,9 +422,8 @@
         }
         $('#computeNPVButton').on('click', function(e) {
             $("#loadingGIF").show();
-
             populateTableDataInit();
-            // $("#loadingGIF").hide();
+            $("#loadingGIF").hide();
         });
         var selectedcurrency = $("#workingcurrency :selected").val() + " ";
         $("#workingcurrency").on('change', function() {
@@ -870,7 +871,7 @@
         }
 
         function updateWorkerStatus(data) {
-            console.log(data);
+            $("#procstatus").html(" " + data + "% complete");
         }
 
         function populateTableDataInit() {
@@ -900,6 +901,9 @@
                     standardizationVar = parseInt(e.data.maxYearlyCost);
                     grid = JSON.parse(e.data.grid);
                     sysGrids = JSON.parse(e.data.sysGrids);
+                    var gridsize = e.data.gridsize;
+                    var gridsize = parseFloat(gridsize * gridsize * 100).toFixed(2);
+                    $("#gridsizecont").html("Note: Grid cell size is " + gridsize + " hectares.");
                     diagGrids = JSON.parse(e.data.diagGrids);
                     populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all', 'all', parseInt(e.data.maxYearlyCost));
                     investmentdata = JSON.parse(e.data.output);
@@ -917,7 +921,7 @@
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
-                $("#loadingGIF").hide();
+                // $("#loadingGIF").hide();
                 humane.log("There was a error in creating maps, please try again.. ", {
                     addnCls: 'humane-flatty-log'
                 });
@@ -947,22 +951,22 @@
                 }
             }, false);
 
-            $("#loadingGIF").hide();
+            // $("#loadingGIF").hide();
         }
 
         function updateMaps() {
             var selectedsystems = [];
-            
-                
-                $('#systemsCB input:checked').each(function() {
-                    selectedsystems.push($(this).attr('id'));
-                });
-           
+
+
+            $('#systemsCB input:checked').each(function() {
+                selectedsystems.push($(this).attr('id'));
+            });
+
 
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
-                $("#loadingGIF").hide();
+                // $("#loadingGIF").hide();
                 humane.log("There was a error in creating maps, please try again.. ", {
                     addnCls: 'humane-flatty-log'
                 });
@@ -992,7 +996,7 @@
                 }
             }, false);
 
-            $("#loadingGIF").hide();
+            // $("#loadingGIF").hide();
         }
         var incomemap = L.map('incomeMap', {
             'zoomControl': false,
@@ -1056,10 +1060,10 @@
                     valueProperty: function(feature) {
                         var m = feature.properties.totalIncome;
                         m = (m / stdVar) * 100;
-                        
-                        return m;                
-                        },
-                    
+
+                        return m;
+                    },
+
                     scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
@@ -1072,7 +1076,7 @@
                     onEachFeature: function(feature, layer) {
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalIncome.toLocaleString() + ' incidents');
-                        var ps = abbrNum(feature.properties.totalIncome,2);
+                        var ps = abbrNum(feature.properties.totalIncome, 2);
                         layer.bindPopup(ps);
                     }
                 }).addTo(incomeLayer);
@@ -1114,12 +1118,12 @@
             if (yearlyOrTotal === 'all') {
 
                 L.choropleth(investmentGrid, {
-                    valueProperty:function(feature) {
+                    valueProperty: function(feature) {
                         var i = feature.properties.totalInvestment;
                         i = (i / stdVar) * 100;
                         // console.log("investment: " + i);
                         return i
-                    }, 
+                    },
                     scale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000'], // reds
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
                     steps: 5,
@@ -1160,7 +1164,7 @@
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : 0;
-                        ps = abbrNum(p2,2);
+                        ps = abbrNum(p2, 2);
 
                         layer.bindPopup(ps);
 
@@ -1178,7 +1182,7 @@
                     valueProperty: function(feature) {
                         var m = feature.properties.totalMaintainence;
                         m = (m / stdVar) * 100;
-                        
+
                         return (-1 * m)
                     },
                     scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
@@ -1198,7 +1202,7 @@
                         ps = Math.abs(ps);
                         ps = abbrNum(ps, 2);
 
-                        layer.bindPopup("-"+ ps);
+                        layer.bindPopup("-" + ps);
 
                     }
                 }).addTo(maintainenceLayer);
@@ -1225,7 +1229,7 @@
                         var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties.maintainence[parseInt(yearlyOrTotal)].toLocaleString() : 0;
                         // console.log(ps);
                         ps = Math.abs(ps);
-                        ps = abbrNum(ps,2);
+                        ps = abbrNum(ps, 2);
                         layer.bindPopup("-" + ps);
 
                     }
@@ -1555,6 +1559,7 @@
         initpercentSliders();
         generateInitTables();
         populateTableDataInit();
+        $("#loadingGIF").hide();
         // computeDCFNPV();
         function showallTables() {
             // hide rest from map, 
