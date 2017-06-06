@@ -423,7 +423,7 @@
         $('#computeNPVButton').on('click', function(e) {
             $("#loadingGIF").show();
             populateTableDataInit();
-            $("#loadingGIF").hide();
+            // $("#loadingGIF").hide();
         });
         var selectedcurrency = $("#workingcurrency :selected").val() + " ";
         $("#workingcurrency").on('change', function() {
@@ -921,7 +921,7 @@
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
-                // $("#loadingGIF").hide();
+                $("#loadingGIF").hide();
                 humane.log("There was a error in creating maps, please try again.. ", {
                     addnCls: 'humane-flatty-log'
                 });
@@ -951,22 +951,21 @@
                 }
             }, false);
 
-            // $("#loadingGIF").hide();
+            $("#loadingGIF").hide();
         }
 
         function updateMaps() {
             var selectedsystems = [];
-
-
             $('#systemsCB input:checked').each(function() {
                 selectedsystems.push($(this).attr('id'));
             });
-
+            $("#loadingGIF").show();
+            $("#procstatus").html("Processing..");
 
             var mapWorker = new Worker('/assets/workers/computeMap.js');
             mapWorker.onerror = function(e) {
                 console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
-                // $("#loadingGIF").hide();
+                $("#loadingGIF").hide();
                 humane.log("There was a error in creating maps, please try again.. ", {
                     addnCls: 'humane-flatty-log'
                 });
@@ -996,7 +995,7 @@
                 }
             }, false);
 
-            // $("#loadingGIF").hide();
+            $("#loadingGIF").hide();
         }
         var incomemap = L.map('incomeMap', {
             'zoomControl': false,
