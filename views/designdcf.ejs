@@ -928,6 +928,7 @@
 
             };
 
+            $("#loadingGIF").show();
             // console.log(selectedsystems);
             mapWorker.postMessage({
                 'grid': grid,
@@ -938,6 +939,7 @@
             });
             mapWorker.addEventListener('message', function(e) {
                 if (e.data.mode === 'status') {
+
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
                     // console.log(e.data.incomeGrid);
@@ -948,13 +950,14 @@
                     plotInvestmentMap(investmentGrid, totalorYearly, stdVar);
                     plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
                     // paint on map.
+                    $("#loadingGIF").hide();
                 }
             }, false);
 
-            $("#loadingGIF").hide();
         }
 
         function updateMaps() {
+
             var selectedsystems = [];
             $('#systemsCB input:checked').each(function() {
                 selectedsystems.push($(this).attr('id'));
@@ -1163,7 +1166,7 @@
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties.investment[parseInt(yearlyOrTotal)].toLocaleString() : 0;
-                        ps = abbrNum(p2, 2);
+                        ps = abbrNum(ps, 2);
 
                         layer.bindPopup(ps);
 
