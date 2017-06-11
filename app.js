@@ -31,9 +31,10 @@ app.get('/', function(request, response) {
         var timelineurl = baseurl + projectid + '/cteams/' + cteamid + '/' + synthesisid + '/timeline/';
         var systemsurl = baseurl + projectid + '/systems/';
         var boundsurl = baseurl + projectid + '/bounds/';
+        var boundaryurl = baseurl + projectid + '/boundaries/';
         var syndiagramsurl = baseurl + projectid + '/cteams/' + cteamid + '/' + synthesisid + '/diagrams/';
         var projecturl = baseurl + projectid + '/';
-        var URLS = [synprojectsurl, boundsurl, timelineurl, systemsurl, projecturl, syndiagramsurl];
+        var URLS = [synprojectsurl, boundsurl, timelineurl, systemsurl, projecturl, syndiagramsurl, boundaryurl];
 
         async.map(URLS, function(url, done) {
             req({
@@ -86,6 +87,7 @@ app.get('/', function(request, response) {
                     "timeline": JSON.stringify(timeline),
                     "projectdetails": JSON.stringify(results[4]),
                     "syndiagrams": JSON.stringify(results[5]),
+                    "boundaries": JSON.stringify(results[6]),
                     "systemdetail": JSON.stringify(sysdetails),
                 };
                 response.render('designdcf', opts);
@@ -94,7 +96,7 @@ app.get('/', function(request, response) {
         });
 
     } else {
-        opts = { 'csrfToken': request.csrfToken(), 'systemdetail': '0', 'apitoken': '0', 'projectid': '0', 'cteamid': '0', "diagramdetail": '0', 'systems': '0', 'synthesisid': '0', "projectdetails": '0' };
+        opts = { 'csrfToken': request.csrfToken(), 'boundaries': '0', 'systemdetail': '0', 'apitoken': '0', 'projectid': '0', 'cteamid': '0', "diagramdetail": '0', 'systems': '0', 'synthesisid': '0', "projectdetails": '0' };
         response.render('designdcf', opts);
     }
 
