@@ -77,6 +77,23 @@
             </div>
         </div>
         <br>
+        <hr>
+        <br>
+        
+        <div id="boundariesCont" class="row" style="display:none">
+            <div class="col-md-6">
+                <h3>Boundary Value </h3>
+                <br>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Tax Income (Total)</h3>
+                <br>
+            </div>
+
+        </div>
+        <br>
+        <hr>
         <br>
         <div class="row">
             <div class="col-md-6">
@@ -120,6 +137,7 @@
                 </div>
             </div>
         </div>
+
         <br>
         <hr>
         <br>
@@ -163,6 +181,20 @@
                     </tbody>
                 </table>
                 <br>
+                <h4>Income</h4>
+
+                <table id="income" class="hor-minimalist-b">
+                    <thead>
+                        <tr class='blank'>&nbsp;&nbsp;</tr>
+                    </thead>
+                    <tbody>
+                        <tr class='blank'>&nbsp;&nbsp;</tr>
+                    </tbody>
+                </table>
+                <br>
+                <p class='pull-right'><small>Yeild Assumption: * - 5%, ** -  6%, *** - 8%, **** - 9%, </small></p>
+
+                <br>
                 <h4>Maintainence</h4>
 
                 <table id="maintainence" class="hor-minimalist-b">
@@ -175,20 +207,6 @@
                 </table>
                 <br>
                 <p class='pull-right'><small>* Maintainence assumes 3% of investment annually. </small></p>
-                <br>
-                <h4>Income</h4>
-
-                <table id="income" class="hor-minimalist-b">
-                    <thead>
-                        <tr class='blank'>&nbsp;&nbsp;</tr>
-                    </thead>
-                    <tbody>
-                        <tr class='blank'>&nbsp;&nbsp;</tr>
-                    </tbody>
-                </table>
-                <br>
-                <p class='pull-right'><small>* Income assumes earnings of 10% of investment every year growing at a rate of 3%. </small></p>
-
             </div>
         </div>
         <!-- /.col-md-4 -->
@@ -205,6 +223,8 @@
                         <tr class='blank'>&nbsp;&nbsp;</tr>
                     </tbody>
                 </table>
+                <br>
+                <p class="pull-right"><span class="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> Year at which investment pays off.</p>
             </div>
 
         </div>
@@ -379,7 +399,9 @@
         var investmentdata;
         var overallgrid;
         var diaggrid;
-
+        if (boundaries.features.length > 0){
+            $("#boundariesCont").show();
+        }
         var startyear = moment(projectdetails['startdate']).year();
 
         // var inputmap = L.map('inputmap', {
@@ -744,14 +766,16 @@
                     } // header is added. 
 
                     // add system row 
-                    var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" + cursys.sysname + "</td>";
+                    var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>"+ cursys.sysname + "</td>";
+                    // add system row 
+                    var incomerowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" + cursys.sysname + "&nbsp;<sup id=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                     for (var g1 = 0; g1 < numYears; g1++) {
                         sysrowHTML += "<td class='sysrow'>&nbsp;</td>";
                     }
                     sysrowHTML += "</tr>";
 
                     $('#investments tbody>tr:last').after(sysrowHTML);
-                    $('#income tbody>tr:last').after(sysrowHTML);
+                    $('#income tbody>tr:last').after(incomerowHTML);
                     $('#npv tbody>tr:last').after(sysrowHTML);
                     $('#maintainence tbody>tr:last').after(sysrowHTML);
                     var diaglen = cursys.diagrams.length;
@@ -767,11 +791,11 @@
                             for (var g2 = 0; g2 < numYears; g2++) {
                                 if (g2 < numYears - 2) {
                                     var cYear = (startyear + yrCounter);
-                                    diagrowHTMLinvest += "<td id=" + "'" + curdiagid + "-" + cYear + "-invest" + "'" + ">" + "0.00m" + "</td>";
+                                    diagrowHTMLinvest += "<td id=" + "'" + curdiagid + "-" + cYear + "-invest" + "'" + ">" + "0.00" + "</td>";
                                     yrCounter += 1;
                                 } else {
                                     if (g2 == (numYears - 1)) {
-                                        diagrowHTMLinvest += "<td id=" + "'" + curdiagid + "-all-invest" + "'" + ">" + "0.00m" + "</td>";
+                                        diagrowHTMLinvest += "<td id=" + "'" + curdiagid + "-all-invest" + "'" + ">" + "0.00" + "</td>";
                                     } else if (g2 == (numYears - 2)) {
                                         diagrowHTMLinvest += "<td>" + "" + "</td>";
                                     }
@@ -785,11 +809,11 @@
                             for (var g3 = 0; g3 < numYears; g3++) {
                                 if (g3 < numYears - 2) {
                                     var cYear = (startyear + yrCounter);
-                                    diagrowHTMLincome += "<td id=" + "'" + curdiagid + "-" + cYear + "-income" + "'" + ">" + "0.00m" + "</td>";
+                                    diagrowHTMLincome += "<td id=" + "'" + curdiagid + "-" + cYear + "-income" + "'" + ">" + "0.00" + "</td>";
                                     yrCounter += 1;
                                 } else {
                                     if (g3 == (numYears - 1)) {
-                                        diagrowHTMLincome += "<td id=" + "'" + curdiagid + "-total-income" + "'" + ">" + "0.00m" + "</td>";
+                                        diagrowHTMLincome += "<td id=" + "'" + curdiagid + "-total-income" + "'" + ">" + "0.00" + "</td>";
                                     } else if (g3 == (numYears - 2)) {
                                         // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
                                         diagrowHTMLincome += "<td>" + "" + "</td>";
@@ -803,14 +827,14 @@
                             for (var g4 = 0; g4 < numYears; g4++) {
                                 if (g4 < (numYears - 2)) {
                                     var cYear = (startyear + yrCounter);
-                                    diagrowHTMLnpv += "<td id=" + "'" + curdiagid + "-" + cYear + "-dcf" + "'" + ">" + "0.00m" + "</td>";
+                                    diagrowHTMLnpv += "<td id=" + "'" + curdiagid + "-" + cYear + "-dcf" + "'" + ">" + "0.00" + "</td>";
                                     yrCounter += 1;
                                 } else {
                                     if (g4 == (numYears - 1)) {
-                                        diagrowHTMLnpv += "<td id=" + "'" + curdiagid + "-total-dcf" + "'" + ">" + "0.00m" + "</td>";
+                                        diagrowHTMLnpv += "<td id=" + "'" + curdiagid + "-total-dcf" + "'" + ">" + "0.00" + "</td>";
                                     } else if (g4 == (numYears - 2)) {
                                         // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
-                                        diagrowHTMLnpv += "<td class='npvcont' id=" + "'" + curdiagid + "-total-npv" + "'" + ">" + "0.00m" + "</td>";
+                                        diagrowHTMLnpv += "<td class='npvcont' id=" + "'" + curdiagid + "-total-npv" + "'" + ">" + "0.00" + "</td>";
                                     }
                                 }
                             }
@@ -822,11 +846,11 @@
                             for (var g5 = 0; g5 < numYears; g5++) {
                                 if (g5 < (numYears - 2)) {
                                     var cYear = (startyear + yrCounter);
-                                    diagrowHTMLmaint += "<td id=" + "'" + curdiagid + "-" + cYear + "-maint" + "'" + ">" + "0.00m" + "</td>";
+                                    diagrowHTMLmaint += "<td id=" + "'" + curdiagid + "-" + cYear + "-maint" + "'" + ">" + "0.00" + "</td>";
                                     yrCounter += 1;
                                 } else {
                                     if (g5 == (numYears - 1)) {
-                                        diagrowHTMLmaint += "<td id=" + "'" + curdiagid + "-total-maint" + "'" + ">" + "0.00m" + "</td>";
+                                        diagrowHTMLmaint += "<td id=" + "'" + curdiagid + "-total-maint" + "'" + ">" + "0.00" + "</td>";
                                     } else if (g5 == (numYears - 2)) {
                                         // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
                                         diagrowHTMLmaint += "<td>" + "" + "</td>";
@@ -849,9 +873,9 @@
                         for (var g5 = 0; g5 < numYears; g5++) {
                             if (g5 < numYears - 2) {
                                 var cYear = (startyear + yrCounter);
-                                rowHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-investment" + "'" + ">0.00m</td>";
-                                rHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-income" + "'" + ">0.00m</td>";
-                                maintHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-maint" + "'" + ">0.00m</td>";
+                                rowHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-investment" + "'" + ">0.00</td>";
+                                rHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-income" + "'" + ">0.00</td>";
+                                maintHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-maint" + "'" + ">0.00</td>";
                                 // npvHTML += "<td class='footertotal' id=" + "'" + cYear +"-total-npv"+"'" + ">0.00m</td>";
                                 yrCounter += 1;
                             }
@@ -1243,10 +1267,19 @@
         }
 
         function populateIncomeInvestment(investmentdata, pprint) {
+            var yeildDict = {};
+            var yeildLookup = {5:"*", 6:"**", 8:"***", 9:"****"};
             for (var g = 0; g < investmentdata.length; g++) {
                 var curInvestmentdata = investmentdata[g];
                 var diagID = curInvestmentdata['id'];
                 var totalInvestment = curInvestmentdata['totalInvestment'];
+                var y = curInvestmentdata['yeild'];
+
+                var curSysID = curInvestmentdata['sysid'];
+                if (yeildDict.hasOwnProperty(curSysID)){} else{
+                    $("#yeild-"+curSysID).html(yeildLookup[y]);
+                    yeildDict[curSysID] = true;
+                }
                 var tInvest;
                 if (pprint) {
                     tInvest = abbrNum(totalInvestment, 1);
@@ -1263,6 +1296,7 @@
                 }
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#" + diagID + "-" + "total-income").html(totalIncome);
+                
 
                 var totalMaint = curInvestmentdata['maintainence']['total'];
                 if (pprint) {
@@ -1333,11 +1367,15 @@
 
             for (var t2 = 0; t2 < investmentdata.length; t2++) {
                 var curSys = investmentdata[t2];
+                var roiYear; 
                 var income = curSys['income'];
                 var investment = curSys['investment'];
                 var maintainence = curSys['maintainence'];
-
+                var totalInvestment = curSys['totalInvestment'];
+                
                 var netIncome = [];
+                var rtIncomeTotal = 0;
+                var found = false;
                 for (var g = 0; g < numYears; g++) {
                     var cYear = (startyear + g);
                     var yearInvestment;
@@ -1358,13 +1396,17 @@
                     } catch (err) {
                         yearMaintainence = 0;
                     }
+                    rtIncomeTotal += yearIncome;
+                    if (rtIncomeTotal >= totalInvestment && found == false){
+                        roiYear = cYear;
+                        found = true;
+                    }
                     yearlyIncomeTotal[cYear] += yearIncome;
                     yearlyInvestmentTotal[cYear] += yearInvestment;
                     yearlyMaintainenceTotal[cYear] += yearMaintainence;
-
                     netIncome.push((yearIncome - yearInvestment - yearMaintainence));
                 }
-
+                // console.log(roiYear);
                 var dcf = [];
                 for (var g1 = 0; g1 < numYears; g1++) {
                     var cYear = (startyear + g1);
@@ -1384,6 +1426,9 @@
 
                             $("#" + curSys['id'] + "-" + cYear + "-dcf").html(parseFloat(curdcf).toFixed(2));
                         }
+                    }
+                    if (roiYear == cYear){
+                        $("#" + curSys['id'] + "-" + cYear + "-dcf").addClass("gray");
                     }
                     var yearlyIncome = yearlyIncomeTotal[cYear];
                     var yearlyInvestment = yearlyInvestmentTotal[cYear];

@@ -3,6 +3,8 @@ importScripts('../js/moment.min.js');
 importScripts('../js/rtree.min.js');
 
 function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize) {
+
+    var whiteListedSysName = ['HDH', 'LDH', 'IND', 'COM', 'COMIND', 'HSNG', 'HSG', 'MXD'];
     var systemdetails = JSON.parse(systemdetails);
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
@@ -61,6 +63,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             }
         }
         sysGrids[sysID] = sysAddedIDs;
+        var yeild;
 
         // number of areas that this grid intersects. 
         // const relevantGridLen = relevantGrid.length;
@@ -72,7 +75,27 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             if (cDFeatlen > 0) {
                 var diagID = cDiag.features[0].properties.diagramid;
                 var sysName = cDiag.features[0].properties.sysname;
+                var sysTag = cDiag.features[0].properties.systag;
             }
+
+            if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
+                if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
+                    yeild = 5; // housing yeild if 4
+                } else if (sysName === 'MXD') {
+                    yeild = 7;
+                } else if (sysName === 'LDH') {
+                    yeild = 6;
+                } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'IND')) {
+                    yeild = 9;
+                }
+            } else if ((sysTag === 'Large buildings, Industry, commerce')) { // system not whitelisted
+                yeild = 8;
+            } else if ((sysTag === 'Small buildings, low density housing')) { // system not whitelisted 
+                yeild = 8;
+            } else {
+                yeild = 6; // default yeild
+            }
+
             var curDiagDetails = { 'id': diagID };
             for (var h = 0; h < sysdetlen; h++) {
                 var cSys = systemdetails[h];
@@ -112,11 +135,16 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             curDiagDetails['investment'] = {};
             curDiagDetails['income'] = {};
             curDiagDetails['maintainence'] = {};
+            curDiagDetails['yeild'] = yeild;
             yearlyCost = parseFloat(totalCost / numYears);
             maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;
             // console.log(maxYearlyCost);
 
-            var tenpercentIncome = yearlyCost * 0.1;
+            // var tenpercentIncome = yearlyCost * 0.1;
+            // var yeild = 6;
+            // console.log(yeild, totalCost);
+            var tenpercentIncome = (yeild * totalCost) / 100;
+            // console.log(tenpercentIncome);
             // for the relevant intersects add income to that  cell for that year. 
 
             // for (var idx = 0; idx < relevantGridLen; idx++) {

@@ -87,7 +87,7 @@ app.get('/', function(request, response) {
                     "timeline": JSON.stringify(timeline),
                     "projectdetails": JSON.stringify(results[4]),
                     "syndiagrams": JSON.stringify(results[5]),
-                    "boundaries": JSON.stringify(results[6]),
+                    "boundaries": JSON.stringify(results[6].geojson),
                     "systemdetail": JSON.stringify(sysdetails),
                 };
                 response.render('designdcf', opts);

@@ -38,6 +38,10 @@ h4 {
     float: right;
 }
 
+.gray {
+    background-color: #ecf0f1;
+}
+
 .icon {
     width: 10px;
     height: 15px;
