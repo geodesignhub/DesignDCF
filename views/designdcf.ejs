@@ -81,16 +81,15 @@
         <br>
 
         <div id="boundariesCont" class="row" style="display:none">
-            <div class="col-md-4">
-                <h3>Boundary Value </h3>
-                <br>
+            <div class="col-md-6">
+                <h3>Boundary Investment </h3>
+                <ul id = 'boundariesinvestmentlist' class="list-group">
+                
+                </ul>
+
             </div>
 
-            <div class="col-md-4">
-                <h3>Boundary Value </h3>
-                <br>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h3>Tax Income (Total)</h3>
                 <br>
             </div>
@@ -1061,12 +1060,29 @@
                 if (e.data.mode === 'status') {
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
-                    console.log(e.data.boundaryValue);
+                    // console.log(e.data.boundaryValue);
+                    renderBoundaryInvestment(JSON.parse(e.data.boundaryValue));
                     $("#loadingGIF").hide();
                     // paint on map.
                 }
             }, false);
 
+        }
+        function renderBoundaryInvestment(boundarydata){
+            var bdata = [];
+            for (var k in boundarydata){
+                var v = boundarydata[k];
+                bdata.push(v);
+            }
+            var bdata = bdata.sort(function(a, b) {
+                return parseFloat(a.totalInvestment) - parseFloat(b.totalInvestment);
+            });
+            $("#boundariesinvestmentlist").empty();
+            for (var x =0; x< bdata.length; x++){
+                var curBoundaryValue = bdata[x];
+                var h = '<li class="list-group-item justify-content-between">'+ curBoundaryValue.bname + '<span class="badge badge-default badge-pill">'+ abbrNum(curBoundaryValue.totalInvestment, 2) + '</span></li>';
+                $("#boundariesinvestmentlist").append(h);
+            }
         }
 
         var incomemap = L.map('incomeMap', {
