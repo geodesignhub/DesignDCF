@@ -79,14 +79,18 @@
         <br>
         <hr>
         <br>
-        
+
         <div id="boundariesCont" class="row" style="display:none">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <h3>Boundary Value </h3>
                 <br>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <h3>Boundary Value </h3>
+                <br>
+            </div>
+            <div class="col-md-4">
                 <h3>Tax Income (Total)</h3>
                 <br>
             </div>
@@ -399,7 +403,7 @@
         var investmentdata;
         var overallgrid;
         var diaggrid;
-        if (boundaries.features.length > 0){
+        if (boundaries.features.length > 0) {
             $("#boundariesCont").show();
         }
         var startyear = moment(projectdetails['startdate']).year();
@@ -766,7 +770,7 @@
                     } // header is added. 
 
                     // add system row 
-                    var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>"+ cursys.sysname + "</td>";
+                    var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" + cursys.sysname + "</td>";
                     // add system row 
                     var incomerowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" + cursys.sysname + "&nbsp;<sup id=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                     for (var g1 = 0; g1 < numYears; g1++) {
@@ -1026,6 +1030,45 @@
             }, false);
 
         }
+
+        function updateBoundaries() {
+
+            var selectedsystems = [];
+            $('#systemsCB input:checked').each(function() {
+                selectedsystems.push($(this).attr('id'));
+            });
+            $("#loadingGIF").show();
+            $("#procstatus").html("Processing..");
+
+            var boundaryWorker = new Worker('/assets/workers/computeBoundaryValue.js');
+            boundaryWorker.onerror = function(e) {
+                console.log('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
+                $("#loadingGIF").hide();
+                humane.log("There was a error in boundary computation, please try again.. ", {
+                    addnCls: 'humane-flatty-log'
+                });
+
+            };
+
+            // console.log(selectedsystems);
+            boundaryWorker.postMessage({
+                'design': JSON.stringify(design),
+                'investmentdata': JSON.stringify(investmentdata),
+                'selectedsystems': JSON.stringify(selectedsystems),
+                'boundaries': JSON.stringify(boundaries),
+            });
+            boundaryWorker.addEventListener('message', function(e) {
+                if (e.data.mode === 'status') {
+                    updateWorkerStatus(e.data.percentcomplete);
+                } else {
+                    console.log(e.data.boundaryValue);
+                    $("#loadingGIF").hide();
+                    // paint on map.
+                }
+            }, false);
+
+        }
+
         var incomemap = L.map('incomeMap', {
             'zoomControl': false,
             'dragging': false,
@@ -1268,7 +1311,12 @@
 
         function populateIncomeInvestment(investmentdata, pprint) {
             var yeildDict = {};
-            var yeildLookup = {5:"*", 6:"**", 8:"***", 9:"****"};
+            var yeildLookup = {
+                5: "*",
+                6: "**",
+                8: "***",
+                9: "****"
+            };
             for (var g = 0; g < investmentdata.length; g++) {
                 var curInvestmentdata = investmentdata[g];
                 var diagID = curInvestmentdata['id'];
@@ -1276,8 +1324,8 @@
                 var y = curInvestmentdata['yeild'];
 
                 var curSysID = curInvestmentdata['sysid'];
-                if (yeildDict.hasOwnProperty(curSysID)){} else{
-                    $("#yeild-"+curSysID).html(yeildLookup[y]);
+                if (yeildDict.hasOwnProperty(curSysID)) {} else {
+                    $("#yeild-" + curSysID).html(yeildLookup[y]);
                     yeildDict[curSysID] = true;
                 }
                 var tInvest;
@@ -1296,7 +1344,7 @@
                 }
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#" + diagID + "-" + "total-income").html(totalIncome);
-                
+
 
                 var totalMaint = curInvestmentdata['maintainence']['total'];
                 if (pprint) {
@@ -1367,12 +1415,12 @@
 
             for (var t2 = 0; t2 < investmentdata.length; t2++) {
                 var curSys = investmentdata[t2];
-                var roiYear; 
+                var roiYear;
                 var income = curSys['income'];
                 var investment = curSys['investment'];
                 var maintainence = curSys['maintainence'];
                 var totalInvestment = curSys['totalInvestment'];
-                
+
                 var netIncome = [];
                 var rtIncomeTotal = 0;
                 var found = false;
@@ -1397,7 +1445,7 @@
                         yearMaintainence = 0;
                     }
                     rtIncomeTotal += yearIncome;
-                    if (rtIncomeTotal >= totalInvestment && found == false){
+                    if (rtIncomeTotal >= totalInvestment && found == false) {
                         roiYear = cYear;
                         found = true;
                     }
@@ -1427,7 +1475,7 @@
                             $("#" + curSys['id'] + "-" + cYear + "-dcf").html(parseFloat(curdcf).toFixed(2));
                         }
                     }
-                    if (roiYear == cYear){
+                    if (roiYear == cYear) {
                         $("#" + curSys['id'] + "-" + cYear + "-dcf").addClass("gray");
                     }
                     var yearlyIncome = yearlyIncomeTotal[cYear];
