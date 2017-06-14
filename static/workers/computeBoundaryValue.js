@@ -1,9 +1,12 @@
 importScripts('../js/turf.min.js');
 importScripts('../js/rtree.min.js');
 
-function computeBoundaryValue(design, boundary, investmentdata, selectedsystems) {
+function computeBoundaryValue(design, boundary, investmentdata, selectedsystems, systemdetails) {
     // get the grid in a rTree
+
+    var whiteListedSysName = ['HDH', 'LDH', 'IND', 'COM', 'COMIND', 'HSNG', 'HSG', 'MXD', 'OFC'];
     var boundary = JSON.parse(boundary);
+    var systemdetails = JSON.parse(systemdetails);
     var design = JSON.parse(design);
     var investmentdata = JSON.parse(investmentdata);
     var selectedsystems = JSON.parse(selectedsystems);
@@ -11,6 +14,7 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems)
     var selectedsystems = selectedsystems.map(function(x) {
         return parseInt(x, 10);
     });
+    var counter = 0;
 
     function makeid() {
         var text = "";
@@ -23,6 +27,8 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems)
     gridTree.geoJSON(design);
     var newboundaries = { "type": "FeatureCollection", "features": [] };
     var bfeatlen = boundary.features.length;
+
+    var fullproc = bfeatlen;
     for (var j2 = 0; j2 < bfeatlen; j2++) {
         var cbndfeat = boundary.features[j2];
         var bndid = makeid();
@@ -46,40 +52,83 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems)
         bndIDDiags[curbndid]['diagrams'] = diags;
     }
     // console.log(JSON.stringify(bndIDDiags));
-    console.log(JSON.stringify(selectedsystems));
-    // var opboundaries = { "type": "FeatureCollection", "features": [] };
+    // console.log(JSON.stringify(selectedsystems));
+    var opboundaries = { "type": "FeatureCollection", "features": [] };
+    var sysdetaillen = systemdetails.length;
     for (var j3 = 0; j3 < bfeatlen; j3++) {
         var cbndfeat = newboundaries.features[j3];
         var bndID = cbndfeat.properties.id;
         var diagramIDs = bndIDDiags[bndID]['diagrams'];
         var totalIncome = 0;
         var totalInvestment = 0;
+        var totalTax = 0;
         // get the items in the grid that intersect the boundary. 
         for (var i1 = 0; i1 < investmentdata.length; i1++) { // loop over the investment data. 
             var curData = investmentdata[i1]; // current investment data
             var diagID = curData.id; // diagram id of the current investment
             var sysID = curData.sysid;
+            var curSys;
+            for (var u1 = 0; u1 < sysdetaillen; u1++) {
+                var sys = systemdetails[u1];
+                if (sysID === sys.id) {
+                    curSys = sys;
+                    break;
+                }
+            }
+            var sysName = curSys.sysname;
             if (diagramIDs.includes(diagID) && (selectedsystems.includes(sysID))) {
-                //
+                var tmpvaluation = (curData['totalInvestment'] * 0.25) + curData['totalInvestment'];
+                if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
+                    if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
+                        taxrate = .18; // housing yeild if 4
+                    } else if (sysName === 'MXD') {
+                        taxrate = .20;
+                    } else if (sysName === 'LDH') {
+                        taxrate = .18;
+                    } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'OFC') || (sysName === 'IND')) {
+                        taxrate = .25;
+                    }
+                    totalTax += tmpvaluation * taxrate * 15;
+                    console.log(totalTax);
+                } else {
+
+                    totalTax += 0;
+                    console.log(totalTax);
+                    // not white listed
+                }
+
                 totalIncome += parseInt(curData['income']['total']);
                 totalInvestment += curData['totalInvestment'];
             }
         }
-        cbndfeat.properties.totalIncome = totalIncome;
-        // opboundaries.features.push(cbndfeat);
         bndIDDiags[curbndid]['totalIncome'] = totalIncome;
         bndIDDiags[curbndid]['totalInvestment'] = totalInvestment;
+        var totalValuation = (totalInvestment * 0.25) + totalInvestment;
+
+        bndIDDiags[curbndid]['totalValuation'] = totalValuation;
         bndIDDiags[curbndid]['bname'] = cbndfeat.properties.bname;
+        bndIDDiags[curbndid]['totalTax'] = totalTax;
+
+
+        cbndfeat.properties.totalTax = totalTax;
+        cbndfeat.properties.totalIncome = totalIncome;
+        cbndfeat.properties.totalValuation = totalValuation;
+        opboundaries.features.push(cbndfeat);
+        counter += 1;
+        self.postMessage({
+            'percentcomplete': parseInt((100 * counter) / fullproc),
+            'mode': 'status',
+        });
     }
 
     self.postMessage({
         'boundaryValue': JSON.stringify(bndIDDiags),
-        // 'newboundaries': JSON.stringify(opboundaries)
+        'newboundaries': JSON.stringify(opboundaries)
     });
 
     // close the worker
-    self.close();
+    // self.close();
 }
 self.onmessage = function(e) {
-    computeBoundaryValue(e.data.design, e.data.boundaries, e.data.investmentdata, e.data.selectedsystems);
+    computeBoundaryValue(e.data.design, e.data.boundaries, e.data.investmentdata, e.data.selectedsystems, e.data.systemdetails);
 }

@@ -83,15 +83,17 @@
         <div id="boundariesCont" class="row" style="display:none">
             <div class="col-md-6">
                 <h3>Boundary Investment </h3>
-                <ul id = 'boundariesinvestmentlist' class="list-group">
-                
+                <ul id='boundariesinvestmentlist' class="list-group">
+
                 </ul>
 
             </div>
 
             <div class="col-md-6">
                 <h3>Tax Income (Total)</h3>
-                <br>
+
+                <div id="taxMap" class="map"></div>
+                <p><small>Tax income is computed for Commerce, Industry and Housing systems. Tax rate yearly is 25% of valuation for commerical, 18% of valuation  for hosing, 20% of valuation  for Industrial systems.</small></p>
             </div>
 
         </div>
@@ -940,6 +942,9 @@
                     computeDCFNPV(investmentdata, pprint);
                     generateSystemCB(systemdetail);
                     $('#systemsCBCont').show();
+                    if (boundaries.features.length > 0) {
+                        updateBoundaries();
+                    }
                 }
             }, false);
 
@@ -1055,6 +1060,7 @@
                 'investmentdata': JSON.stringify(investmentdata),
                 'selectedsystems': JSON.stringify(selectedsystems),
                 'boundaries': JSON.stringify(boundaries),
+                'systemdetails': JSON.stringify(systemdetail),
             });
             boundaryWorker.addEventListener('message', function(e) {
                 if (e.data.mode === 'status') {
@@ -1062,15 +1068,44 @@
                 } else {
                     // console.log(e.data.boundaryValue);
                     renderBoundaryInvestment(JSON.parse(e.data.boundaryValue));
+                    renderBoundaryTaxMap(JSON.parse(e.data.newboundaries))
                     $("#loadingGIF").hide();
                     // paint on map.
                 }
             }, false);
 
         }
-        function renderBoundaryInvestment(boundarydata){
+
+        function renderBoundaryTaxMap(newboundaries) {
+            taxLayer.clearLayers();
+
+            L.choropleth(newboundaries, {
+                valueProperty: function(feature) {
+                    var m = feature.properties.totalTax;
+                    // m = (m / stdVar) * 100;
+                    return m;
+                },
+
+                scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+                steps: 5,
+                mode: 'q',
+                style: {
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                },
+                onEachFeature: function(feature, layer) {
+                    // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+                    //     feature.properties.totalIncome.toLocaleString() + ' incidents');
+                    var ps = abbrNum(feature.properties.totalTax, 2);
+                    layer.bindPopup(ps);
+                }
+            }).addTo(taxLayer);
+        }
+
+        function renderBoundaryInvestment(boundarydata) {
             var bdata = [];
-            for (var k in boundarydata){
+            for (var k in boundarydata) {
                 var v = boundarydata[k];
                 bdata.push(v);
             }
@@ -1078,9 +1113,9 @@
                 return parseFloat(a.totalInvestment) - parseFloat(b.totalInvestment);
             });
             $("#boundariesinvestmentlist").empty();
-            for (var x =0; x< bdata.length; x++){
+            for (var x = 0; x < bdata.length; x++) {
                 var curBoundaryValue = bdata[x];
-                var h = '<li class="list-group-item justify-content-between">'+ curBoundaryValue.bname + '<span class="badge badge-default badge-pill">'+ abbrNum(curBoundaryValue.totalInvestment, 2) + '</span></li>';
+                var h = '<li class="list-group-item justify-content-between">' + curBoundaryValue.bname + '<span class="badge badge-default badge-pill">' + abbrNum(curBoundaryValue.totalInvestment, 2) + '</span></li>';
                 $("#boundariesinvestmentlist").append(h);
             }
         }
@@ -1099,6 +1134,19 @@
         var incomeLayer = L.featureGroup().addTo(incomemap);
 
 
+        var taxmap = L.map('taxMap', {
+            'zoomControl': false,
+            'dragging': false,
+            'touchZoom': false,
+            'scrollWheelZoom': false,
+            'doubleClickZoom': false
+        });
+        var taxBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 18,
+        }).addTo(taxmap);
+        var taxLayer = L.featureGroup().addTo(taxmap);
+
         var investmentmap = L.map('investmentMap', {
             'zoomControl': false,
             'dragging': false,
@@ -1111,8 +1159,6 @@
             maxZoom: 18,
         }).addTo(investmentmap);
         var investmentLayer = L.featureGroup().addTo(investmentmap);
-
-
 
         var maintainencemap = L.map('maintainenceMap', {
             'zoomControl': false,
@@ -1137,6 +1183,7 @@
         incomemap.fitBounds(mB);
         investmentmap.fitBounds(mB);
         maintainencemap.fitBounds(mB);
+        taxmap.fitBounds(mB);
 
         function plotIncomeMap(incomeGrid, yearlyOrTotal, stdVar) {
 
@@ -1609,6 +1656,10 @@
                 // $("#loadingGIF").show();
                 // TODO: update maps for system. 
                 updateMaps();
+
+                if (boundaries.features.length > 0) {
+                    updateBoundaries();
+                }
                 // hide rest from map, 
                 $('#investments > tbody > tr').each(function() {
                     var cls = $(this).attr('class');
