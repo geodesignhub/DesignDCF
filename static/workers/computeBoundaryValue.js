@@ -101,13 +101,13 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems,
                 totalInvestment += curData['totalInvestment'];
             }
         }
-        bndIDDiags[curbndid]['totalIncome'] = totalIncome;
-        bndIDDiags[curbndid]['totalInvestment'] = totalInvestment;
+        bndIDDiags[bndID]['totalIncome'] = totalIncome;
+        bndIDDiags[bndID]['totalInvestment'] = totalInvestment;
         var totalValuation = (totalInvestment * 0.25) + totalInvestment;
 
-        bndIDDiags[curbndid]['totalValuation'] = totalValuation;
-        bndIDDiags[curbndid]['bname'] = cbndfeat.properties.bname;
-        bndIDDiags[curbndid]['totalTax'] = totalTax;
+        bndIDDiags[bndID]['totalValuation'] = totalValuation;
+        bndIDDiags[bndID]['bname'] = cbndfeat.properties.bname;
+        bndIDDiags[bndID]['totalTax'] = totalTax;
 
 
         cbndfeat.properties.totalTax = totalTax;
