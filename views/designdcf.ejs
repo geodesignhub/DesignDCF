@@ -791,7 +791,7 @@
                             var curdiagprops = curdiag.features[0].properties;
                             var curdiagid = curdiag.features[0].properties.diagramid;
                             // var curdiagname = curdiag.
-                            var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "</td>";
+                            var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
                             yrCounter = 0
                             for (var g2 = 0; g2 < numYears; g2++) {
                                 if (g2 < numYears - 2) {
@@ -809,7 +809,7 @@
                             diagrowHTMLinvest += "</tr>";
                             $('#investments tbody>tr:last').after(diagrowHTMLinvest);
 
-                            var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "</td>";
+                            var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
                             yrCounter = 0
                             for (var g3 = 0; g3 < numYears; g3++) {
                                 if (g3 < numYears - 2) {
@@ -846,7 +846,7 @@
                             diagrowHTMLnpv += "</tr>";
                             $('#npv tbody>tr:last').after(diagrowHTMLnpv);
 
-                            var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "</td>";
+                            var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
                             yrCounter = 0;
                             for (var g5 = 0; g5 < numYears; g5++) {
                                 if (g5 < (numYears - 2)) {
@@ -1385,6 +1385,10 @@
                 var diagID = curInvestmentdata['id'];
                 var totalInvestment = curInvestmentdata['totalInvestment'];
                 var y = curInvestmentdata['yeild'];
+                var units =  curInvestmentdata['units'];
+                if (units > 0){
+                    $(".units-" + diagID).html(units + ' units approx.');
+                }
 
                 var curSysID = curInvestmentdata['sysid'];
                 if (yeildDict.hasOwnProperty(curSysID)) {} else {

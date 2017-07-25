@@ -89,11 +89,11 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems,
                         taxrate = .25;
                     }
                     totalTax += tmpvaluation * taxrate * 15;
-                    console.log(totalTax);
+                    // console.log(totalTax);
                 } else {
 
                     totalTax += 0;
-                    console.log(totalTax);
+                    // console.log(totalTax);
                     // not white listed
                 }
 
