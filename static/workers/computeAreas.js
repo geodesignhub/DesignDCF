@@ -188,11 +188,11 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
                 if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
                     yeild = 5; // housing yeild if 4
-                    var hdh = HDHousing();
+                    var hdh = new HDHousing();
                     units = hdh.generateUnits(totAreaM);
                 } else if (sysName === 'MXD') {
                     yeild = 7;
-                    var mxd = MXDBuildings();
+                    var mxd = new MXDBuildings();
                     var units = mxd.generateUnits(totAreaM);
                 } else if (sysName === 'LDH') {
                     var ldh = new LDHousing();
