@@ -225,7 +225,12 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
                     curDiagDetails['sysid'] = cSys['id'];
                 }
             }
-            totalCost = totArea * sysCost;
+            if (units == 0) {
+                totalCost = totArea * sysCost;
+
+            } else {
+                totalCost = units * sysCost;
+            }
 
             // check if diagram existsin in timeline.
             var numYears = 0;
