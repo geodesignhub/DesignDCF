@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Design Discounted Cash Flow Calculator</title>
+    <title>Design Financials</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="Description" lang="en" content="Geodesign Hub Evaluation Maps Builder">
     <meta name="author" content="Geodesign Hub">
@@ -59,21 +59,12 @@
 
         <div class="row">
             <div class="col-md-6">
-                <h3 id="designName">Discounted Cash Flow Analysis</h3>
-                <p class="description">This plugin downloads a design from Geodesign Hub, computes its area and construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow" target="_blank">Discounted Cash Flow</a> analysis to calculate Net
-                    Present Value of this design. Choose the WACC and click on Compute Net Present Value, then you can copy paste it in Excel.</p><br><br>
+                <h3 id="designName">About</h3>
+                <p class="description">This plugin downloads a design from Geodesignhub, computes its area and construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow" target="_blank">Discounted Cash Flow</a> analysis to calculate Net Present Value of this design. Choose the WACC and click on Compute Net Present Value, then you can copy paste it in Excel.</p><br><br>
             </div>
 
-            <div class="col-md-6 text-right">
-                <!--<h3>Design Synthesis</h3>
-                <div id="inputmap"></div>-->
-                <h5>Weighted Annual Cost of Capital (WACC)</h5>
-                <p class='ionslider'><input type="text" id="wacc-slider" name="wacc" value="" /></p>
-                <br><br><br><br>
-                <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button></p>
-                <p><span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
-                </p>
-                <br>
+            <div class="col-md-6">
+               
             </div>
         </div>
         <br>
@@ -113,6 +104,8 @@
                     <input type="radio" id= 'yearlymap' name="mapdisplay" value="yearly" >Yearly
                 </label>
                 </div>
+                <p><span id="loadingGIFMap"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatusMap">Processing</span>...</span>
+                </p>
             </div>
 
         </div>
@@ -146,11 +139,25 @@
         <br>
         <hr>
         <br>
-        <div class="row">
-            <div class="col-md-6">
+        <div class='row'>
+            <div class='col-md-6'>
                 <h3>Financial Statement</h3>
                 <br>
                 <br>
+            </div>
+            <div class='col-md-6  text-right'>
+                <h5>Weighted Annual Cost of Capital (WACC)</h5>
+                <p class='ionslider'><input type="text" id="wacc-slider" name="wacc" value="" /></p>
+                <br><br><br><br>
+                <p><button id="computeNPVButton" type="button" class="btn btn-info"><i class="glyphicon glyphicon-certificate"></i> Compute Net Present Value</button></p>
+                <p><span id="loadingGIF"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatus">Processing</span>...</span>
+                </p>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                
             </div>
 
             <div class="col-md-6 text-right">
@@ -276,7 +283,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>&copy; 2017 <a href="https://www.geodesignhub.com/">Geodesign Hub</a>, see the <a href="https://github.com/geodesignhub/DesignDCF/">GitHub repository</a> for more information.</p>
+                    <p>&copy; 2017 <a href="https://www.geodesignhub.com/">Geodesignhub</a>, see the <a href="https://github.com/geodesignhub/DesignDCF/">GitHub repository</a> for more information.</p>
                 </div>
             </div>
         </footer>
@@ -903,6 +910,9 @@
         function updateWorkerStatus(data) {
             $("#procstatus").html(" " + data + "% complete");
         }
+        function updateMapsWorkerStatus(data){
+            $("#procstatusMap").html(" " + data + "% complete");
+        }
 
         function populateTableDataInit() {
             var areaWorker = new Worker('/assets/workers/computeAreas.js');
@@ -973,7 +983,7 @@
             mapWorker.addEventListener('message', function(e) {
                 if (e.data.mode === 'status') {
 
-                    updateWorkerStatus(e.data.percentcomplete);
+                    updateMapsWorkerStatus(e.data.percentcomplete);
                 } else {
                     // console.log(e.data.incomeGrid);
                     incomeGrid = JSON.parse(e.data.incomeGrid);
@@ -983,7 +993,8 @@
                     plotInvestmentMap(investmentGrid, totalorYearly, stdVar);
                     plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
                     // paint on map.
-                    $("#loadingGIF").hide();
+                    $("#loadingGIFMap").hide();
+                    
                 }
             }, false);
 
@@ -1125,7 +1136,8 @@
             'dragging': false,
             'touchZoom': false,
             'scrollWheelZoom': false,
-            'doubleClickZoom': false
+            'doubleClickZoom': false,
+            'attributionControl':false
         });
         var incomeBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
@@ -1139,7 +1151,8 @@
             'dragging': false,
             'touchZoom': false,
             'scrollWheelZoom': false,
-            'doubleClickZoom': false
+            'doubleClickZoom': false,
+            'attributionControl':false
         });
         var taxBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
@@ -1152,7 +1165,8 @@
             'dragging': false,
             'touchZoom': false,
             'scrollWheelZoom': false,
-            'doubleClickZoom': false
+            'doubleClickZoom': false,
+            'attributionControl':false
         });
         var incomeBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
@@ -1165,7 +1179,8 @@
             'dragging': false,
             'touchZoom': false,
             'scrollWheelZoom': false,
-            'doubleClickZoom': false
+            'doubleClickZoom': false,
+            'attributionControl':false
         });
         var maintainenceBaseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
