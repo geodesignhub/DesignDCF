@@ -797,9 +797,10 @@
                         if (curdiag.features.length > 0) {
                             var curdiagprops = curdiag.features[0].properties;
                             var curdiagid = curdiag.features[0].properties.diagramid;
+                            console.log(curdiagprops);
                             // var curdiagname = curdiag.
-                            var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
-                            yrCounter = 0
+                            var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + ' <small>('+ curdiag.features[0].properties.fundingtype +')</small>'+ "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
+                            yrCounter = 0;
                             for (var g2 = 0; g2 < numYears; g2++) {
                                 if (g2 < numYears - 2) {
                                     var cYear = (startyear + yrCounter);
@@ -816,7 +817,7 @@
                             diagrowHTMLinvest += "</tr>";
                             $('#investments tbody>tr:last').after(diagrowHTMLinvest);
 
-                            var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
+                            var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + ' <small>('+ curdiag.features[0].properties.fundingtype +')</small>'+ "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
                             yrCounter = 0
                             for (var g3 = 0; g3 < numYears; g3++) {
                                 if (g3 < numYears - 2) {
@@ -834,7 +835,7 @@
                             }
                             diagrowHTMLincome += "</tr>";
                             $('#income tbody>tr:last').after(diagrowHTMLincome);
-                            var diagrowHTMLnpv = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "</td>";
+                            var diagrowHTMLnpv = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + ' <small>('+ curdiag.features[0].properties.fundingtype +')</small>'+ "</td>";
                             yrCounter = 0;
                             for (var g4 = 0; g4 < numYears; g4++) {
                                 if (g4 < (numYears - 2)) {
@@ -853,7 +854,7 @@
                             diagrowHTMLnpv += "</tr>";
                             $('#npv tbody>tr:last').after(diagrowHTMLnpv);
 
-                            var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
+                            var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" + curdiagprops.description + ' <small>('+ curdiag.features[0].properties.fundingtype +')</small>'+ "<br><small class=" + "'units-" + curdiagid + "'" + "></small></td>";
                             yrCounter = 0;
                             for (var g5 = 0; g5 < numYears; g5++) {
                                 if (g5 < (numYears - 2)) {
