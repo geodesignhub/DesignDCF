@@ -1,5 +1,5 @@
 # Discounted Cash Flow Analysis on a Design
-This plugin downloads a design using the [Geodesign Hub API](https://www.geodesignhub.com/api/), computes its area and construction costs and provides a [Discounted Cash Flow](https://en.wikipedia.org/wiki/Discounted_cash_flow) analysis to calculate Net Present Value of this design. The core idea of this plugin is to generate the data and then use Excel or other programs to do more advanced analysis. To that effect, it support numeric data that simply be copy pasted in Excel. 
+This plugin downloads a design using the [Geodesignhub API](https://www.geodesignhub.com/api/), computes its area and construction costs and provides a [Discounted Cash Flow](https://en.wikipedia.org/wiki/Discounted_cash_flow) analysis to calculate Net Present Value of this design. The core idea of this plugin is to generate the data and then use Excel or other programs to do more advanced analysis. To that effect, it support numeric data that simply be copy pasted in Excel. 
 
 ### Spatial Analysis Library
 In additon to showing the basic financial numbers, a spatial anlaysis library is included in this plugin. The library analyzes the location of the diagram and then generates a grid. Once the grid is generated, it allocates the costs over that grid. This is useful to visualize how money flows in the design over space. 
