@@ -3,13 +3,13 @@ importScripts('../js/moment.min.js');
 importScripts('../js/rtree.min.js');
 
 
-var COMBuilding = function() {
+var COMBuilding = function () {
     const elevationoffset = 1;
     const comHeights = [14, 25, 30, 22, 28];
     const floorHeight = 5;
     const avgUnitsize = 50;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + comHeights[Math.floor(Math.random() * comHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -18,13 +18,13 @@ var COMBuilding = function() {
     };
 }
 
-var LDHousing = function() {
+var LDHousing = function () {
     const elevationoffset = 1;
     const ldhHeights = [1, 2, 3];
     const floorHeight = 5;
     const avgUnitsize = 100;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + ldhHeights[Math.floor(Math.random() * ldhHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -33,13 +33,13 @@ var LDHousing = function() {
     };
 }
 
-var HDHousing = function() {
+var HDHousing = function () {
     const elevationoffset = 1;
     const hdhHeights = [36, 60, 90]; // in meters 
     const floorHeight = 5;
     const avgUnitsize = 50;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + hdhHeights[Math.floor(Math.random() * hdhHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -48,13 +48,13 @@ var HDHousing = function() {
     };
 }
 
-var MXDBuildings = function() {
+var MXDBuildings = function () {
     const elevationoffset = 1;
     const mxdHeights = [9, 12, 8, 11]; // in meters 
     const floorHeight = 5;
     const avgUnitsize = 75;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + mxdHeights[Math.floor(Math.random() * mxdHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -63,13 +63,13 @@ var MXDBuildings = function() {
     };
 }
 
-var LABBuildings = function() {
+var LABBuildings = function () {
     const elevationoffset = 1;
     var labHeights = [10, 15];
     const floorHeight = 5;
     const avgUnitsize = 100;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + labHeights[Math.floor(Math.random() * labHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -78,13 +78,13 @@ var LABBuildings = function() {
     };
 }
 
-var SMBBuildings = function() {
+var SMBBuildings = function () {
     const elevationoffset = 1;
     var smbHeights = [2, 3, 5, 6, 7, 10];
     const floorHeight = 5;
     const avgUnitsize = 75;
 
-    this.generateUnits = function(area) {
+    this.generateUnits = function (area) {
         var height = elevationoffset + smbHeights[Math.floor(Math.random() * smbHeights.length)];
         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
         var numUnitsperFloor = Math.round(area / avgUnitsize);
@@ -95,7 +95,6 @@ var SMBBuildings = function() {
 
 
 function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize) {
-
     var whiteListedSysName = ['HDH', 'LDH', 'IND', 'COM', 'COMIND', 'HSNG', 'HSG', 'MXD'];
     var systemdetails = JSON.parse(systemdetails);
     var systems = JSON.parse(systems);
@@ -114,7 +113,10 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
     var addedIDs = [];
     var sysGrids = {};
     var diagGrids = {};
-    var relevantGrid = { "type": "FeatureCollection", "features": [] };
+    var relevantGrid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
 
     for (var x = 0; x < syslen; x++) {
         var cSys = systems[x];
@@ -127,9 +129,10 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             var diagAddedIDs = [];
             var curDiag = allDiagrams[n];
             var cDFeatlen = curDiag.features.length;
-            if (cDFeatlen > 0) {
-                var diagID = curDiag.features[0].properties.diagramid;
-
+            var diagID = curDiag.features[0].properties.diagramid;
+            var projectorpolicy = curDiag.features[0].properties.areatype;
+            
+            if (cDFeatlen > 0 && projectorpolicy == 'project') {
                 // loop over each feature in the current diagram
                 for (var b = 0; b < cDFeatlen; b++) {
                     var curFeat = curDiag.features[b];
@@ -150,8 +153,9 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
                     }
                 }
 
-                diagGrids[diagID] = diagAddedIDs;
             }
+            
+            diagGrids[diagID] = diagAddedIDs;
         }
         sysGrids[sysID] = sysAddedIDs;
         var yeild;
@@ -166,25 +170,32 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
         for (var y = 0; y < allDiaglen; y++) {
             var sysCost = 0;
             var cDiag = allDiagrams[y];
+            
             var cDFeatlen = cDiag.features.length;
             if (cDFeatlen > 0) {
                 var diagID = cDiag.features[0].properties.diagramid;
                 var sysName = cDiag.features[0].properties.sysname;
                 var sysTag = cDiag.features[0].properties.systag;
             }
-
+            var projectorpolicy = cDiag.features[0].properties.areatype;
             var totArea;
             var totAreaM;
             var totalCost = 0;
-
-            try {
-                totAreaM = turf.area(cDiag);
-                totArea = totAreaM * 0.0001; // in hectares
-            } catch (err) { //throw JSON.stringify(err)
-                // console.log(err);
-                totArea = 0;
-            } // catch ends
             var units = 0;
+            
+            if (projectorpolicy == 'policy') {
+                totArea = 0;
+            } else {
+                try {
+                    bufArea = turf.buffer(cDiag,.01);
+                    totAreaM = turf.area(bufArea);
+                    totArea = totAreaM * 0.0001; // in hectares                    
+                } catch (err) { //throw JSON.stringify(err)
+                    // console.log(err);
+                    totArea = 0;
+                } // catch ends
+            }
+            
             if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
                 if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
                     yeild = 5; // housing yeild if 4
@@ -216,21 +227,22 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
                 yeild = 6; // default yeild
             }
 
-            var curDiagDetails = { 'id': diagID };
+      
+            var curDiagDetails = {
+                'id': diagID
+            };
             for (var h = 0; h < sysdetlen; h++) {
                 var cSys = systemdetails[h];
+                
+                
                 var sName = cSys['sysname'];
                 if (sName === sysName) {
                     sysCost = cSys['syscost'];
                     curDiagDetails['sysid'] = cSys['id'];
                 }
             }
-            if (units == 0) {
-                totalCost = totArea * sysCost;
 
-            } else {
-                totalCost = units * sysCost;
-            }
+            totalCost = totArea * sysCost;
 
             // check if diagram existsin in timeline.
             var numYears = 0;
@@ -246,6 +258,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             }
             // if the diagram exists get the number of years 
             // else default is 2
+            
             curDiagDetails['totalInvestment'] = totalCost;
             curDiagDetails['investment'] = {};
             curDiagDetails['income'] = {};
@@ -327,7 +340,7 @@ function generateGrid(bounds, startyear, systems) {
 
         return text;
     }
-    bounds = bounds.split(",").map(function(item) {
+    bounds = bounds.split(",").map(function (item) {
         return parseFloat(item, 10);
     });
     // 1 hectare grid
@@ -344,7 +357,10 @@ function generateGrid(bounds, startyear, systems) {
     gridsize = round(gridsize, 2);
     // console.log(gridsize);
     var g = turf.squareGrid(bounds, gridsize, 'kilometers');
-    var grid = { "type": "FeatureCollection", "features": [] };
+    var grid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
     var gridlen = g.features.length;
     // var initCosts = [];
 
@@ -371,7 +387,7 @@ function generateGrid(bounds, startyear, systems) {
     return [grid, gridsize];
 
 }
-self.onmessage = function(e) {
+self.onmessage = function (e) {
     gridgridsize = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
     computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize);
 }

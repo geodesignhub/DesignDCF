@@ -1072,7 +1072,8 @@ ul.input-list li {
 .hor-minimalist-b td {
     border-bottom: 1px solid #f5f5f5;
     color: #606060;
-    padding: 12px 0px;
+    /* padding: 12px 0px; */
+    padding-right: 5px;
     min-width: 60px;
     text-align: right;
 }
