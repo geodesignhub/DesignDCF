@@ -1698,12 +1698,12 @@
                 }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv = Math.abs(npv);
-                const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
+                // const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
                 if (npv < 0) {
                     if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html( totalTxt+ '('  + abbrNum(absnpv, 1) + ')');
+                        $("#" + curSys['id'] + "-total-npv").html( '('  + abbrNum(absnpv, 1) + ')');
                     } else {
-                        $("#" + curSys['id'] + "-total-npv").html(totalTxt + parseFloat(npv).toFixed(2));
+                        $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
                     }
 
                         if ($("#" + curSys['id'] + "-total-npv").hasClass('red')) {
@@ -1716,9 +1716,9 @@
                         $("#" + curSys['id'] + "-total-npv").addClass('red');
                 } else {
                     if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html(totalTxt + abbrNum(absnpv, 1));
+                        $("#" + curSys['id'] + "-total-npv").html( abbrNum(absnpv, 1));
                     } else {
-                        $("#" + curSys['id'] + "-total-npv").html(totalTxt + parseFloat(npv).toFixed(2));
+                        $("#" + curSys['id'] + "-total-npv").html( parseFloat(npv).toFixed(2));
                     }
 
                         if ($("#" + curSys['id'] + "-total-npv").hasClass('red')) {
