@@ -1698,7 +1698,7 @@
                 }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv = Math.abs(npv);
-                const totalTxt = parseInt(curSys['totalInvestment']) + " - " + parseInt(totaldcf) +"<br>;
+                const totalTxt = parseInt(curSys['totalInvestment']) + " - " + parseInt(totaldcf) +"<br>";
                 if (npv < 0) {
                     if (pprint) {
                         $("#" + curSys['id'] + "-total-npv").html('(' totalTxt + abbrNum(absnpv, 1) + ')');
