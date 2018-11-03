@@ -1701,7 +1701,7 @@
                 const totalTxt = parseInt(curSys['totalInvestment']) + " - " + parseInt(totaldcf) +"<br>";
                 if (npv < 0) {
                     if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html('(' totalTxt + abbrNum(absnpv, 1) + ')');
+                        $("#" + curSys['id'] + "-total-npv").html( totalTxt+ '('  + abbrNum(absnpv, 1) + ')');
                     } else {
                         $("#" + curSys['id'] + "-total-npv").html(totalTxt + parseFloat(npv).toFixed(2));
                     }
