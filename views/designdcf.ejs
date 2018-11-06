@@ -1691,14 +1691,14 @@
                         $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
                     }
 
-                        if ($("#" + curSys['id'] + "-total-dcf").hasClass('red')) {
-                            $("#" + curSys['id'] + "-total-dcf").removeClass('red');
-                        }
-                        if ($("#" + curSys['id'] + "-total-dcf").hasClass('green')) {
-                            $("#" + curSys['id'] + "-total-dcf").removeClass('green');
+                        // if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
+                        //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
+                        // }
+                        // else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
+                        //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
 
-                        }
-                        $("#" + curSys['id'] + "-total-dcf").addClass('red');
+                        // }
+                        // $("#" + curSys['id'] + "-total-dcf").addClass('bg-danger');
                 } else {
                     if (pprint) {
                         $("#" + curSys['id'] + "-total-dcf").html(abbrNum(abstotaldcf, 1));
@@ -1706,15 +1706,15 @@
                         $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
                     }
 
-                        if ($("#" + curSys['id'] + "-total-dcf").hasClass('red')) {
-                            $("#" + curSys['id'] + "-total-dcf").removeClass('red');
-                        }
-                        if ($("#" + curSys['id'] + "-total-dcf").hasClass('green')) {
-                            $("#" + curSys['id'] + "-total-dcf").removeClass('green');
+                //         if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
+                //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
+                //         }
+                //         else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
+                //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
 
-                        }
-                        $("#" + curSys['id'] + "-total-npv").addClass('red');
-                }
+                //         }
+                //         $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
+                // }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv = Math.abs(npv);
                 // const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
@@ -1724,15 +1724,13 @@
                     } else {
                         $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
                     }
-
-                        // if ($("#" + curSys['id'] + "-total-npv").hasClass('red')) {
-                        //     $("#" + curSys['id'] + "-total-npv").removeClass('red');
-                        // }
-                        // if ($("#" + curSys['id'] + "-total-npv").hasClass('green')) {
-                        //     $("#" + curSys['id'] + "-total-npv").removeClass('green');
-
-                        // }
-                        // $("#" + curSys['id'] + "-total-npv").addClass('red');
+                        if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
+                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
+                        }
+                        else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
+                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
+                        }
+                        $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
                 } else {
                     if (pprint) {
                         $("#" + curSys['id'] + "-total-npv").html( abbrNum(absnpv, 1));
@@ -1740,14 +1738,13 @@
                         $("#" + curSys['id'] + "-total-npv").html( parseFloat(npv).toFixed(2));
                     }
 
-                        // if ($("#" + curSys['id'] + "-total-npv").hasClass('red')) {
-                        //     $("#" + curSys['id'] + "-total-npv").removeClass('red');
-                        // }
-                        // if ($("#" + curSys['id'] + "-total-npv").hasClass('green')) {
-                        //     $("#" + curSys['id'] + "-total-npv").removeClass('green');
-
-                        // }
-                        // $("#" + curSys['id'] + "-total-npv").addClass('green');
+                        if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
+                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
+                        }
+                        else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
+                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
+                        }
+                        $("#" + curSys['id'] + "-total-npv").addClass('bg-danger');
                 }
             }
 
