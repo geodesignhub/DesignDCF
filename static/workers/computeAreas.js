@@ -198,33 +198,33 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             
             if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
                 if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
-                    yeild = 5; // housing yeild if 4
+                    yeild = 10; // housing yeild if 4
                     var hdh = new HDHousing();
                     units = hdh.generateUnits(totAreaM);
                 } else if (sysName === 'MXD') {
-                    yeild = 7;
+                    yeild = 16;
                     var mxd = new MXDBuildings();
                     var units = mxd.generateUnits(totAreaM);
                 } else if (sysName === 'LDH') {
                     var ldh = new LDHousing();
                     units = ldh.generateUnits(totAreaM);
-                    yeild = 6;
+                    yeild = 12;
                 } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'IND')) {
                     var com = new COMBuilding();
                     units = com.generateUnits(totAreaM);
-                    yeild = 9;
+                    yeild = 18;
                 }
             } else if ((sysTag === 'Large buildings, Industry, commerce')) { // system not whitelisted
                 var lab = new LABBuildings();
                 units = lab.generateUnits(totAreaM);
-                yeild = 8;
+                yeild = 16;
             } else if ((sysTag === 'Small buildings, low density housing')) { // system not whitelisted 
                 var smb = new SMBBuildings();
                 units = smb.generateUnits(totAreaM);
-                yeild = 8;
+                yeild = 16;
             } else {
                 units = 0;
-                yeild = 6; // default yeild
+                yeild = 12; // default yeild
             }
 
       
@@ -264,7 +264,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
             curDiagDetails['income'] = {};
             curDiagDetails['maintainence'] = {};
             curDiagDetails['yeild'] = yeild;
-
+            
             curDiagDetails['units'] = units;
             yearlyCost = parseFloat(totalCost / numYears);
             maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;

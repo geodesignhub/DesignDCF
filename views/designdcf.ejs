@@ -202,7 +202,7 @@
                     </tbody>
                 </table>
                 <br>
-                <p class='pull-right'><small>Yeild Assumption: * - 5%, ** - 6%, *** - 8%, **** - 9%, </small></p>
+                <p class='pull-right'><small>Yeild Assumption : * - 10%, ** - 12%, *** - 16%, **** - 18%</small></p>
 
                 <br>
                 <h4>Maintainence</h4>
@@ -234,8 +234,7 @@
                     </tbody>
                 </table>
                 <br>
-                <p class="pull-right"><span class="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> Year
-                    at which investment pays off.</p>
+                <p class="pull-right"><span class="bg-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> This investement is currently undervalued&nbsp;&nbsp;&nbsp;<span class="bg-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> This investement is currently overvalued&nbsp;&nbsp;&nbsp;<span class="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> Year at which investment pays off</p>
             </div>
 
         </div>
@@ -756,13 +755,13 @@
                     var yrCounter = 0
                     if (headcounter === 0) { // header row
                         var rowHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader'></th><th class='fundingheader'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
                         var rHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader'></th><th class='fundingheader'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
                         var mHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader'></th><th class='fundingheader'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
                         var npvHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader'></th><th class='fundingheader'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
 
                         for (var g = 0; g < numYears; g++) {
                             if (g < numYears - 2) {
@@ -827,7 +826,7 @@
                             // var curdiagname = curdiag.
                             var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g2 = 0; g2 < numYears; g2++) {
@@ -850,7 +849,7 @@
 
                             var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0
                             for (var g3 = 0; g3 < numYears; g3++) {
@@ -873,7 +872,7 @@
                             $('#income tbody>tr:last').after(diagrowHTMLincome);
                             var diagrowHTMLnpv = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g4 = 0; g4 < numYears; g4++) {
@@ -899,7 +898,7 @@
 
                             var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g5 = 0; g5 < numYears; g5++) {
@@ -1464,10 +1463,10 @@
         function populateIncomeInvestment(investmentdata, pprint) {
             var yeildDict = {};
             var yeildLookup = {
-                5: "*",
-                6: "**",
-                8: "***",
-                9: "****"
+                10: "*",
+                12: "**",
+                16: "***",
+                18: "****"
             };
             for (var g = 0; g < investmentdata.length; g++) {
                 var curInvestmentdata = investmentdata[g];
@@ -1714,7 +1713,7 @@
 
                 //         }
                 //         $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
-                // }
+                }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv = Math.abs(npv);
                 // const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
