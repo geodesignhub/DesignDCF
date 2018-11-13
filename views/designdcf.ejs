@@ -13,6 +13,7 @@
     <link rel="shortcut icon" href="/assets/loaders/favicon.ico">
     <!-- Bootstrap Core CSS file -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/bootstrap-editable.css">
     <!-- Override CSS file - add your own CSS rules -->
     <link rel="stylesheet" href="assets/css/ion.rangeSlider.css">
     <link rel="stylesheet" href="assets/css/ion.rangeSlider.skinFlat.css">
@@ -169,6 +170,13 @@
                 <div id="systemsCBCont" style="display:none">
                     <h4>Systems</h4>
                     <div id="systemsCB"></div>
+
+
+                    <p class='pull-right'>Yeild Assumption : * - <a class="editable" href="#" id="one-star" data-type="text"
+                            data-title="Enter integer yeild e.g. 5">10</a> %, ** - <a class="editable" href="#" id="two-star"
+                            data-type="text" data-title="Enter integer yeild e.g. 5">12</a> %, *** - <a class="editable"
+                            href="#" id="three-star" data-type="text" data-title="Enter integer yeild e.g. 5">16</a> %,
+                        **** - <a class="editable" href="#" id="four-star" data-type="text" data-title="Enter integer yeild e.g. 5">18</a> %</p>
                 </div>
             </div>
         </div>
@@ -202,7 +210,6 @@
                     </tbody>
                 </table>
                 <br>
-                <p class='pull-right'><small>Yeild Assumption : * - 10%, ** - 12%, *** - 16%, **** - 18%</small></p>
 
                 <br>
                 <h4>Maintainence</h4>
@@ -234,7 +241,10 @@
                     </tbody>
                 </table>
                 <br>
-                <p class="pull-right"><span class="bg-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> This investement is currently undervalued&nbsp;&nbsp;&nbsp;<span class="bg-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> This investement is currently overvalued&nbsp;&nbsp;&nbsp;<span class="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> Year at which investment pays off</p>
+                <p class="pull-right"><span class="bg-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    This investement is currently undervalued&nbsp;&nbsp;&nbsp;<span class="bg-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    This investement is currently overvalued&nbsp;&nbsp;&nbsp;<span class="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    Year at which investment pays off</p>
             </div>
 
         </div>
@@ -315,6 +325,7 @@
     <!-- Bootstrap Core scripts -->
     <script type="text/javascript" src="assets/js/ion.rangeSlider.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-editable.min.js"></script>
     <script type="text/javascript" src="assets/js/colors.js"></script>
     <script type="text/javascript" src="assets/js/leaflet.js"></script>
     <script type="text/javascript" src="assets/js/choropleth.js"></script>
@@ -798,7 +809,7 @@
                     } // header is added. 
 
                     // add system row 
-                    
+
                     var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" +
                         cursys.sysname + "</td>";
                     // add system row 
@@ -826,7 +837,8 @@
                             // var curdiagname = curdiag.
                             var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g2 = 0; g2 < numYears; g2++) {
@@ -849,7 +861,8 @@
 
                             var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0
                             for (var g3 = 0; g3 < numYears; g3++) {
@@ -872,7 +885,8 @@
                             $('#income tbody>tr:last').after(diagrowHTMLincome);
                             var diagrowHTMLnpv = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g4 = 0; g4 < numYears; g4++) {
@@ -898,7 +912,8 @@
 
                             var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" + curdiagid + "'" +
+                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                curdiagid + "'" +
                                 ">" + curdiagprops.fundingtype + "</td>";
                             yrCounter = 0;
                             for (var g5 = 0; g5 < numYears; g5++) {
@@ -980,13 +995,15 @@
                 });
 
             };
-            // console.log(selectedsystems);
+            const yeilds = $("#one-star, #two-star, #three-star, #four-star").editable('getValue');
+
             areaWorker.postMessage({
                 'systemdetails': JSON.stringify(systemdetail),
                 'systems': JSON.stringify(systems),
                 'timeline': JSON.stringify(timeline),
                 'startyear': JSON.stringify(startyear),
-                'bounds': bounds['bounds']
+                'bounds': bounds['bounds'], 
+                'yeilds':JSON.stringify(yeilds)
             });
             areaWorker.addEventListener('message', function (e) {
                 if (e.data.mode === 'status') {
@@ -1555,7 +1572,7 @@
         function computeDCFNPV(investmentdata, pprint) {
 
             var wacc = (parseFloat($("#wacc-slider").val()) / 100);
-     
+
             var yearlyIncomeTotal = {};
             var yearlyInvestmentTotal = {};
             var yearlyDCFTotal = {};
@@ -1685,19 +1702,19 @@
                 if (totaldcf < 0) {
                     if (pprint) {
                         $("#" + curSys['id'] + "-total-dcf").html('(' + abbrNum(abstotaldcf, 1) + ')');
-                        
+
                     } else {
                         $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
                     }
 
-                        // if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
-                        //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
-                        // }
-                        // else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
-                        //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
+                    // if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
+                    //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
+                    // }
+                    // else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
+                    //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
 
-                        // }
-                        // $("#" + curSys['id'] + "-total-dcf").addClass('bg-danger');
+                    // }
+                    // $("#" + curSys['id'] + "-total-dcf").addClass('bg-danger');
                 } else {
                     if (pprint) {
                         $("#" + curSys['id'] + "-total-dcf").html(abbrNum(abstotaldcf, 1));
@@ -1705,45 +1722,43 @@
                         $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
                     }
 
-                //         if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
-                //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
-                //         }
-                //         else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
-                //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
+                    //         if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
+                    //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
+                    //         }
+                    //         else if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-success')) {
+                    //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-success');
 
-                //         }
-                //         $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
+                    //         }
+                    //         $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
                 }
                 var npv = curSys['totalInvestment'] - totaldcf;
                 var absnpv = Math.abs(npv);
                 // const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
                 if (npv < 0) {
                     if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html( '('  + abbrNum(absnpv, 1) + ')');
+                        $("#" + curSys['id'] + "-total-npv").html('(' + abbrNum(absnpv, 1) + ')');
                     } else {
                         $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
                     }
-                        if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
-                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
-                        }
-                        else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
-                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
-                        }
-                        $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
+                    if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
+                        $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
+                    } else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
+                        $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
+                    }
+                    $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
                 } else {
                     if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html( abbrNum(absnpv, 1));
+                        $("#" + curSys['id'] + "-total-npv").html(abbrNum(absnpv, 1));
                     } else {
-                        $("#" + curSys['id'] + "-total-npv").html( parseFloat(npv).toFixed(2));
+                        $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
                     }
 
-                        if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
-                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
-                        }
-                        else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
-                            $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
-                        }
-                        $("#" + curSys['id'] + "-total-npv").addClass('bg-danger');
+                    if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
+                        $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
+                    } else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
+                        $("#" + curSys['id'] + "-total-npv").removeClass('bg-success');
+                    }
+                    $("#" + curSys['id'] + "-total-npv").addClass('bg-danger');
                 }
             }
 
@@ -1885,6 +1900,18 @@
                     addnCls: 'humane-flatty-success'
                 });
             }
+        });
+        $(document).ready(function () {
+            $('.editable').editable({
+                validate: function (value) {
+                    
+                    if ($.trim(value) == '') {
+                        return 'This field is required';
+                    } else if (parseInt(value) >  25) {
+                        return "Yeild must be a number less than 25"
+                    }
+                }
+            });
         });
     </script>
 </body>

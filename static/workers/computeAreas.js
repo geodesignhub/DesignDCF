@@ -94,12 +94,14 @@ var SMBBuildings = function () {
 }
 
 
-function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize) {
+function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize, usersubyeilds) {
+
     var whiteListedSysName = ['HDH', 'LDH', 'IND', 'COM', 'COMIND', 'HSNG', 'HSG', 'MXD'];
     var systemdetails = JSON.parse(systemdetails);
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
     var startyear = parseInt(startyear);
+    const usersubmittedyeilds= JSON.parse(usersubyeilds);
     var maxYearlyCost = 0;
     diagCosts = [];
     var gridTree = RTree();
@@ -195,36 +197,47 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize)
                     totArea = 0;
                 } // catch ends
             }
-            
+
             if (whiteListedSysName.indexOf(sysName) >= 0) { // system is whitelisted
                 if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
-                    yeild = 10; // housing yeild if 4
+                    yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'one-star' in usersubmittedyeilds) ? usersubmittedyeilds['one-star'] : 10;
+                    // yeild = 10; // housing yeild if 4
                     var hdh = new HDHousing();
                     units = hdh.generateUnits(totAreaM);
                 } else if (sysName === 'MXD') {
-                    yeild = 16;
+                    
+                    yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
+                    // yeild = 16;
                     var mxd = new MXDBuildings();
                     var units = mxd.generateUnits(totAreaM);
                 } else if (sysName === 'LDH') {
                     var ldh = new LDHousing();
                     units = ldh.generateUnits(totAreaM);
-                    yeild = 12;
+                    
+                    yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
+                    // yeild = 12;
                 } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'IND')) {
                     var com = new COMBuilding();
                     units = com.generateUnits(totAreaM);
-                    yeild = 18;
+                    yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'four-star' in usersubmittedyeilds) ? usersubmittedyeilds['four-star'] : 18;
+                    // yeild = 18;
                 }
             } else if ((sysTag === 'Large buildings, Industry, commerce')) { // system not whitelisted
                 var lab = new LABBuildings();
                 units = lab.generateUnits(totAreaM);
-                yeild = 16;
+                // yeild = 16;
+                yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
             } else if ((sysTag === 'Small buildings, low density housing')) { // system not whitelisted 
                 var smb = new SMBBuildings();
                 units = smb.generateUnits(totAreaM);
-                yeild = 16;
+                // yeild = 16;
+                
+                yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
             } else {
                 units = 0;
-                yeild = 12; // default yeild
+                // yeild = 12; // default yeild
+                
+                yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
             }
 
       
@@ -389,5 +402,5 @@ function generateGrid(bounds, startyear, systems) {
 }
 self.onmessage = function (e) {
     gridgridsize = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
-    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize);
+    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize, e.data.yeilds);
 }
