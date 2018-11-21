@@ -177,6 +177,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             if (cDFeatlen > 0) {
                 var diagID = cDiag.features[0].properties.diagramid;
                 var sysName = cDiag.features[0].properties.sysname;
+                var diagName = cDiag.features[0].properties.description;
                 var sysTag = cDiag.features[0].properties.systag;
             }
             var projectorpolicy = cDiag.features[0].properties.areatype;
@@ -242,7 +243,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
 
       
             var curDiagDetails = {
-                'id': diagID
+                'id': diagID,
+                'title':diagName
             };
             for (var h = 0; h < sysdetlen; h++) {
                 var cSys = systemdetails[h];
@@ -250,8 +252,10 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 
                 var sName = cSys['sysname'];
                 if (sName === sysName) {
+                    
                     sysCost = cSys['syscost'];
                     curDiagDetails['sysid'] = cSys['id'];
+                    curDiagDetails['sysname'] =sName;
                 }
             }
 
@@ -279,6 +283,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             curDiagDetails['yeild'] = yeild;
             
             curDiagDetails['units'] = units;
+            curDiagDetails['name'] = units;
+            
             yearlyCost = parseFloat(totalCost / numYears);
             maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;
 

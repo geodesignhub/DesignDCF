@@ -62,8 +62,7 @@
                 <p class="description">This plugin downloads a design from Geodesignhub, computes its area and
                     construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow"
                         target="_blank">Discounted Cash Flow</a> analysis to calculate Net Present Value of this
-                    design. Choose the WACC and click on Compute Net Present Value, then you can copy paste it in
-                    Excel.</p><br><br>
+                    design. Choose the WACC and click on Compute Net Present Value, then you can download computed data as a CSV file.</p><br><br>
             </div>
 
             <div class="col-md-6">
@@ -171,12 +170,13 @@
                     <h4>Systems</h4>
                     <div id="systemsCB"></div>
 
-
+                    <br>
                     <p class='pull-right'>Yeild Assumption : * - <a class="editable" href="#" id="one-star" data-type="text"
                             data-title="Enter integer yeild e.g. 5">10</a> %, ** - <a class="editable" href="#" id="two-star"
                             data-type="text" data-title="Enter integer yeild e.g. 5">12</a> %, *** - <a class="editable"
                             href="#" id="three-star" data-type="text" data-title="Enter integer yeild e.g. 5">16</a> %,
-                        **** - <a class="editable" href="#" id="four-star" data-type="text" data-title="Enter integer yeild e.g. 5">18</a> %</p>
+                        **** - <a class="editable" href="#" id="four-star" data-type="text" data-title="Enter integer yeild e.g. 5">18</a>
+                        %</p>
                 </div>
             </div>
         </div>
@@ -248,23 +248,18 @@
             </div>
 
         </div>
-
         <div class="row">
             <div class="col-md-6">
 
             </div>
 
-            <div class="col-md-6 text-right">
-                <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-default active">
-                        <input type="radio" name="pprintdisplay" value="pprint" checked="">Pretty Print
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="radio" name="pprintdisplay" value="raw">Raw
-                    </label>
-                </div>
+            <div class="col-md-6"><br>
+                <p class="pull-right">
+                    <a class="btn btn-sm" id="download_data_as_csv">Download data as a CSV</a>
+                </p><br><br>
             </div>
         </div>
+
         <!-- /.row -->
         <br>
 
@@ -1002,15 +997,14 @@
                 'systems': JSON.stringify(systems),
                 'timeline': JSON.stringify(timeline),
                 'startyear': JSON.stringify(startyear),
-                'bounds': bounds['bounds'], 
-                'yeilds':JSON.stringify(yeilds)
+                'bounds': bounds['bounds'],
+                'yeilds': JSON.stringify(yeilds)
             });
             areaWorker.addEventListener('message', function (e) {
                 if (e.data.mode === 'status') {
                     updateWorkerStatus(e.data.percentcomplete);
                 } else {
-                    var raworpp = $('input:radio[name="pprintdisplay"]:checked').val();
-                    var pprint = (raworpp == 'raw') ? 0 : 1;
+
                     standardizationVar = parseInt(e.data.maxYearlyCost);
                     grid = JSON.parse(e.data.grid);
                     sysGrids = JSON.parse(e.data.sysGrids);
@@ -1021,9 +1015,10 @@
                     populateMaps(e.data.grid, e.data.sysGrids, e.data.diagGrids, e.data.output, 'all', 'all',
                         parseInt(e.data.maxYearlyCost));
                     investmentdata = JSON.parse(e.data.output);
+
                     showallTables();
-                    populateIncomeInvestment(investmentdata, pprint);
-                    computeDCFNPV(investmentdata, pprint);
+                    populateIncomeInvestment(investmentdata);
+                    computeDCFNPV(investmentdata);
                     generateSystemCB(systemdetail);
 
                     $("#loadingGIF").hide();
@@ -1034,6 +1029,68 @@
                 }
             }, false);
 
+        }
+        (function (console) {
+            console.save = function (data, filename) {
+                if (!data) {
+                    console.error('Console.save: No data')
+                    return;
+                }
+                if (!filename) filename = 'investmentdata.csv'
+                if (typeof data === "object") {
+                    data = JSON.stringify(data, undefined, 4)
+                }
+                var blob = new Blob([data], {
+                        type: 'text/json'
+                    }),
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a')
+                a.download = filename
+                a.href = window.URL.createObjectURL(blob)
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0,
+                    null)
+                a.dispatchEvent(e)
+            }
+        })(console)
+
+        function convert_investment_to_csv() {
+            formatted_investment = [];
+            const cInvest = investmentdata;
+
+
+            function populateCSVData(investmentdata, datatype) {
+                for (let index = 0; index < cInvest.length; index++) {
+                    const element = cInvest[index];
+                    var cur_ele_item = {
+                        'title': element['title'],
+                        'systemname': element['sysname'],
+                        'type': datatype
+                    };
+                    var startyear = parseInt(Object.keys(element[datatype])[0]);
+                    for (var g = 0; g < numYears; g++) {
+                        cur_ele_item[startyear] = element[datatype][startyear];
+                        var startyear = (startyear + 1);
+                    }
+                    formatted_investment.push(cur_ele_item);
+                }
+            }
+            populateCSVData(cInvest, 'investment');
+            populateCSVData(cInvest, 'income');
+            populateCSVData(cInvest, 'maintainence');
+            // var json = formatted_investment.items;
+            var fields = Object.keys(formatted_investment[0]);
+            var replacer = function (key, value) {
+                return value === null ? '' : value
+            };
+            var csv = formatted_investment.map(function (row) {
+                return fields.map(function (fieldName) {
+                    return JSON.stringify(row[fieldName], replacer)
+                }).join(',');
+            })
+            csv.unshift(fields.join(',')) // add header column
+
+            console.save(csv.join('\r\n'));
         }
 
         function populateMaps(grid, sysGridIDs, diagGridIDs, idata, selectedsystems, totalorYearly, stdVar) {
@@ -1477,7 +1534,7 @@
             }
         }
 
-        function populateIncomeInvestment(investmentdata, pprint) {
+        function populateIncomeInvestment(investmentdata) {
             var yeildDict = {};
             var yeildLookup = {
                 10: "*",
@@ -1502,31 +1559,23 @@
                     yeildDict[curSysID] = true;
                 }
                 var tInvest;
-                if (pprint) {
-                    tInvest = abbrNum(totalInvestment, 1);
-                } else {
-                    tInvest = parseFloat(totalInvestment).toFixed(2);
-                }
+                tInvest = abbrNum(totalInvestment, 1);
+
                 $("#" + diagID + "-all-invest").html(tInvest);
                 // var annualIncome = abbrNum(curInvestmentdata['income']['yearly'],1);
                 var totalIncome;
-                if (pprint) {
-                    totalIncome = abbrNum(curInvestmentdata['income']['total'], 1);
-                } else {
-                    totalIncome = parseFloat(curInvestmentdata['income']['total']).toFixed(2);
-                }
+                totalIncome = abbrNum(curInvestmentdata['income']['total'], 1);
+
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#" + diagID + "-" + "total-income").html(totalIncome);
 
 
                 var totalMaint = curInvestmentdata['maintainence']['total'];
-                if (pprint) {
-                    var abstotalMaint = Math.abs(totalMaint);
-                    // totalMaint = '(' + abbrNum(abstotalMaint, 1) + ')';
-                    totalMaint = abbrNum(abstotalMaint, 1);
-                } else {
-                    totalMaint = parseFloat(totalMaint).toFixed(2);
-                }
+
+                var abstotalMaint = Math.abs(totalMaint);
+                // totalMaint = '(' + abbrNum(abstotalMaint, 1) + ')';
+                totalMaint = abbrNum(abstotalMaint, 1);
+
                 // $("#"+ diagID+ "-"+"annual-income").html(annualIncome);
                 $("#" + diagID + "-" + "total-maint").html(totalMaint);
 
@@ -1538,38 +1587,31 @@
                     var totalIncome = curInvestmentdata['income']['total'];
                     if (currentYear in cInvest) {
                         var yearlyInvest = 0;
-                        if (pprint) {
-                            yearlyInvest = abbrNum(cInvest[currentYear], 1);
-                        } else {
-                            yearlyInvest = parseFloat(cInvest[currentYear]).toFixed(2);
-                        }
+
+                        yearlyInvest = abbrNum(cInvest[currentYear], 1);
+
                         $("#" + diagID + "-" + currentYear + "-invest").html(yearlyInvest);
                     }
                     var yearlyIncome = 0;
-                    if (pprint) {
-                        yearlyIncome = abbrNum(cIncome[currentYear], 1);
-                    } else {
-                        yearlyIncome = parseFloat(cIncome[currentYear]).toFixed(2);
-                    }
+                    yearlyIncome = abbrNum(cIncome[currentYear], 1);
+
                     $("#" + diagID + "-" + currentYear + "-income").html(yearlyIncome);
                     // var totalIncome = 
                     // $("#"+ diagID+ "-"+"growth").html(0.03);
 
                     var yearlyMaintainence = 0;
                     var absMaint = Math.abs(cMaint[currentYear]);
-                    if (pprint) {
-                        // yearlyMaintainence = '(' + abbrNum(absMaint, 1) + ')';
-                        yearlyMaintainence = abbrNum(absMaint, 1);
-                    } else {
-                        yearlyMaintainence = parseFloat(cMaint[currentYear]).toFixed(2);
-                    }
+
+                    // yearlyMaintainence = '(' + abbrNum(absMaint, 1) + ')';
+                    yearlyMaintainence = abbrNum(absMaint, 1);
+
                     $("#" + diagID + "-" + currentYear + "-maint").html(yearlyMaintainence);
 
                 }
             }
         }
 
-        function computeDCFNPV(investmentdata, pprint) {
+        function computeDCFNPV(investmentdata) {
 
             var wacc = (parseFloat($("#wacc-slider").val()) / 100);
 
@@ -1635,18 +1677,15 @@
                     dcf.push(parseInt(curdcf));
                     var abscurDCF = Math.abs(curdcf);
                     if (curdcf < 0) {
-                        if (pprint) {
-                            $("#" + curSys['id'] + "-" + cYear + "-dcf").html('(' + abbrNum(abscurDCF, 1) + ')');
-                        } else {
-                            $("#" + curSys['id'] + "-" + cYear + "-dcf").html(parseFloat(curdcf).toFixed(2));
-                        }
-                    } else {
-                        if (pprint) {
-                            $("#" + curSys['id'] + "-" + cYear + "-dcf").html(abbrNum(abscurDCF, 1));
-                        } else {
+                        $("#" + curSys['id'] + "-" + cYear + "-dcf").html('(' + abbrNum(abscurDCF, 1) + ')');
 
-                            $("#" + curSys['id'] + "-" + cYear + "-dcf").html(parseFloat(curdcf).toFixed(2));
-                        }
+                    } else {
+
+                        $("#" + curSys['id'] + "-" + cYear + "-dcf").html(abbrNum(abscurDCF, 1));
+
+                    }
+                    if ($("#" + curSys['id'] + "-" + cYear + "-dcf").hasClass("gray")) {
+                        $("#" + curSys['id'] + "-" + cYear + "-dcf").removeClass("gray");
                     }
                     if (roiYear == cYear) {
                         $("#" + curSys['id'] + "-" + cYear + "-dcf").addClass("gray");
@@ -1660,38 +1699,28 @@
                     var absyearlyMaintainence = Math.abs(yearlyMaintainence);
 
                     if (yearlyIncome < 0) {
-                        if (pprint) {
-                            $("#" + +cYear + "-total-income").html('(' + abbrNum(yearlyIncome, 1) + ')');
-                        } else {
-                            $("#" + +cYear + "-total-income").html(parseFloat(yearlyIncome).toFixed(2));
-                        }
+
+                        $("#" + +cYear + "-total-income").html('(' + abbrNum(yearlyIncome, 1) + ')');
+
                     } else {
-                        if (pprint) {
-                            $("#" + +cYear + "-total-income").html(abbrNum(yearlyIncome, 1));
-                        } else {
-                            $("#" + +cYear + "-total-income").html(parseFloat(yearlyIncome).toFixed(2));
-                        }
+
+                        $("#" + +cYear + "-total-income").html(abbrNum(yearlyIncome, 1));
+
                     }
                     if (yearlyMaintainence < 0) {
                         var absyrlyMaintainence = Math.abs(yearlyMaintainence);
-                        if (pprint) {
-                            $("#" + +cYear + "-total-maint").html('(' + abbrNum(absyrlyMaintainence, 1) + ')');
-                        } else {
-                            $("#" + +cYear + "-total-maint").html(parseFloat(yearlyMaintainence).toFixed(2));
-                        }
+
+                        $("#" + +cYear + "-total-maint").html('(' + abbrNum(absyrlyMaintainence, 1) + ')');
+
                     }
                     if (yearlyInvestment < 0) {
-                        if (pprint) {
-                            $("#" + +cYear + "-total-investment").html('(' + abbrNum(yearlyInvestment, 1) + ')');
-                        } else {
-                            $("#" + +cYear + "-total-investment").html(parseFloat(yearlyInvestment).toFixed(2));
-                        }
+
+                        $("#" + +cYear + "-total-investment").html('(' + abbrNum(yearlyInvestment, 1) + ')');
+
                     } else {
-                        if (pprint) {
-                            $("#" + +cYear + "-total-investment").html(abbrNum(yearlyInvestment, 1));
-                        } else {
-                            $("#" + +cYear + "-total-investment").html(parseFloat(yearlyInvestment).toFixed(2));
-                        }
+
+                        $("#" + +cYear + "-total-investment").html(abbrNum(yearlyInvestment, 1));
+
                     }
                 }
 
@@ -1700,12 +1729,9 @@
                 }, 0);
                 var abstotaldcf = Math.abs(totaldcf);
                 if (totaldcf < 0) {
-                    if (pprint) {
-                        $("#" + curSys['id'] + "-total-dcf").html('(' + abbrNum(abstotaldcf, 1) + ')');
 
-                    } else {
-                        $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
-                    }
+                    $("#" + curSys['id'] + "-total-dcf").html('(' + abbrNum(abstotaldcf, 1) + ')');
+
 
                     // if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
                     //     $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
@@ -1716,11 +1742,8 @@
                     // }
                     // $("#" + curSys['id'] + "-total-dcf").addClass('bg-danger');
                 } else {
-                    if (pprint) {
-                        $("#" + curSys['id'] + "-total-dcf").html(abbrNum(abstotaldcf, 1));
-                    } else {
-                        $("#" + curSys['id'] + "-total-dcf").html(parseFloat(totaldcf).toFixed(2));
-                    }
+
+                    $("#" + curSys['id'] + "-total-dcf").html(abbrNum(abstotaldcf, 1));
 
                     //         if ($("#" + curSys['id'] + "-total-dcf").hasClass('bg-danger')) {
                     //             $("#" + curSys['id'] + "-total-dcf").removeClass('bg-danger');
@@ -1735,11 +1758,9 @@
                 var absnpv = Math.abs(npv);
                 // const totalTxt = "<small>"+ abbrNum(parseInt(curSys['totalInvestment'])) + " - " + abbrNum(parseInt(totaldcf)) +"<small><br>";
                 if (npv < 0) {
-                    if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html('(' + abbrNum(absnpv, 1) + ')');
-                    } else {
-                        $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
-                    }
+
+                    $("#" + curSys['id'] + "-total-npv").html('(' + abbrNum(absnpv, 1) + ')');
+
                     if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
                         $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
                     } else if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-success')) {
@@ -1747,11 +1768,9 @@
                     }
                     $("#" + curSys['id'] + "-total-npv").addClass('bg-success');
                 } else {
-                    if (pprint) {
-                        $("#" + curSys['id'] + "-total-npv").html(abbrNum(absnpv, 1));
-                    } else {
-                        $("#" + curSys['id'] + "-total-npv").html(parseFloat(npv).toFixed(2));
-                    }
+
+                    $("#" + curSys['id'] + "-total-npv").html(abbrNum(absnpv, 1));
+
 
                     if ($("#" + curSys['id'] + "-total-npv").hasClass('bg-danger')) {
                         $("#" + curSys['id'] + "-total-npv").removeClass('bg-danger');
@@ -1763,9 +1782,9 @@
             }
 
         }
-        $('input:radio[name="pprintdisplay"]').change(function (event) {
-            populateTableDataInit();
-        });
+        // $('input:radio[name="pprintdisplay"]').change(function (event) {
+        //     populateTableDataInit();
+        // });
 
 
         $('input:radio[name="mapdisplay"]').change(function (event) {
@@ -1901,13 +1920,18 @@
                 });
             }
         });
+        
+        $('#download_data_as_csv').on('click', function (event) {
+            convert_investment_to_csv();
+
+        });
         $(document).ready(function () {
             $('.editable').editable({
                 validate: function (value) {
-                    
+
                     if ($.trim(value) == '') {
                         return 'This field is required';
-                    } else if (parseInt(value) >  25) {
+                    } else if (parseInt(value) > 25) {
                         return "Yeild must be a number less than 25"
                     }
                 }
