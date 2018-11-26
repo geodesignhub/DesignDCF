@@ -101,7 +101,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
     var systems = JSON.parse(systems);
     var timeline = JSON.parse(timeline);
     var startyear = parseInt(startyear);
-    const usersubmittedyeilds= JSON.parse(usersubyeilds);
+    const usersubmittedyeilds = JSON.parse(usersubyeilds);
     var maxYearlyCost = 0;
     diagCosts = [];
     var gridTree = RTree();
@@ -133,7 +133,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             var cDFeatlen = curDiag.features.length;
             var diagID = curDiag.features[0].properties.diagramid;
             var projectorpolicy = curDiag.features[0].properties.areatype;
-            
+
             if (cDFeatlen > 0 && projectorpolicy == 'project') {
                 // loop over each feature in the current diagram
                 for (var b = 0; b < cDFeatlen; b++) {
@@ -156,7 +156,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 }
 
             }
-            
+
             diagGrids[diagID] = diagAddedIDs;
         }
         sysGrids[sysID] = sysAddedIDs;
@@ -172,25 +172,27 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
         for (var y = 0; y < allDiaglen; y++) {
             var sysCost = 0;
             var cDiag = allDiagrams[y];
-            
+
             var cDFeatlen = cDiag.features.length;
             if (cDFeatlen > 0) {
                 var diagID = cDiag.features[0].properties.diagramid;
                 var sysName = cDiag.features[0].properties.sysname;
                 var diagName = cDiag.features[0].properties.description;
                 var sysTag = cDiag.features[0].properties.systag;
+                var cost_override = cDiag.features[0].properties.cost_override;
+                var cost_override_type = cDiag.features[0].properties.cost_override_type;
             }
             var projectorpolicy = cDiag.features[0].properties.areatype;
             var totArea;
             var totAreaM;
             var totalCost = 0;
             var units = 0;
-            
+
             if (projectorpolicy == 'policy') {
                 totArea = 0;
             } else {
                 try {
-                    bufArea = turf.buffer(cDiag,.01);
+                    bufArea = turf.buffer(cDiag, .01);
                     totAreaM = turf.area(bufArea);
                     totArea = totAreaM * 0.0001; // in hectares                    
                 } catch (err) { //throw JSON.stringify(err)
@@ -206,7 +208,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                     var hdh = new HDHousing();
                     units = hdh.generateUnits(totAreaM);
                 } else if (sysName === 'MXD') {
-                    
+
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
                     // yeild = 16;
                     var mxd = new MXDBuildings();
@@ -214,7 +216,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 } else if (sysName === 'LDH') {
                     var ldh = new LDHousing();
                     units = ldh.generateUnits(totAreaM);
-                    
+
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
                     // yeild = 12;
                 } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'IND')) {
@@ -232,34 +234,42 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 var smb = new SMBBuildings();
                 units = smb.generateUnits(totAreaM);
                 // yeild = 16;
-                
+
                 yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
             } else {
                 units = 0;
                 // yeild = 12; // default yeild
-                
+
                 yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
             }
 
-      
+
             var curDiagDetails = {
                 'id': diagID,
-                'title':diagName
+                'title': diagName
             };
             for (var h = 0; h < sysdetlen; h++) {
                 var cSys = systemdetails[h];
-                
-                
+
+
                 var sName = cSys['sysname'];
                 if (sName === sysName) {
-                    
+
                     sysCost = cSys['syscost'];
                     curDiagDetails['sysid'] = cSys['id'];
-                    curDiagDetails['sysname'] =sName;
+                    curDiagDetails['sysname'] = sName;
                 }
             }
-
-            totalCost = totArea * sysCost;
+            // console.log(cost_override_type, cost_override);
+            if (cost_override !== 0) {
+                if (cost_override_type == 'total') {
+                    totalCost = cost_override;
+                } else {
+                    totalCost = totArea * cost_override;
+                }
+            } else {
+                totalCost = totArea * sysCost;
+            }
 
             // check if diagram existsin in timeline.
             var numYears = 0;
@@ -275,16 +285,16 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             }
             // if the diagram exists get the number of years 
             // else default is 2
-            
+
             curDiagDetails['totalInvestment'] = totalCost;
             curDiagDetails['investment'] = {};
             curDiagDetails['income'] = {};
             curDiagDetails['maintainence'] = {};
             curDiagDetails['yeild'] = yeild;
-            
+
             curDiagDetails['units'] = units;
             curDiagDetails['name'] = units;
-            
+
             yearlyCost = parseFloat(totalCost / numYears);
             maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;
 
