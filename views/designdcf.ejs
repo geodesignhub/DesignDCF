@@ -20,6 +20,7 @@
     <link rel="stylesheet" type="text/css" href="assets/css/flatty.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/leaflet.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap4.min.css" />
     <link rel="stylesheet" href="assets/css/styles.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
@@ -42,7 +43,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Design Discounted Cash Flow Analysis</a>
+                <a class="navbar-brand" href="#">Design Spatial Financial Analysis</a>
             </div>
             <!-- /.navbar-header -->
             <!-- /.navbar-collapse -->
@@ -57,43 +58,50 @@
         <!-- Heading Row -->
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <h3 id="designName">About</h3>
                 <p class="description">This plugin downloads a design from Geodesignhub, computes its area and
                     construction costs and provides a <a href="https://en.wikipedia.org/wiki/Discounted_cash_flow"
                         target="_blank">Discounted Cash Flow</a> analysis to calculate Net Present Value of this
-                    design. Choose the WACC and click on Compute Net Present Value, then you can download computed data as a CSV file.</p><br><br>
+                    design. Choose the WACC and click on Compute Net Present Value, then you can download computed data
+                    as a CSV file.</p><br><br>
             </div>
 
-            <div class="col-md-6">
-
-            </div>
-        </div>
-        <br>
-        <hr>
-        <br>
-
-        <div id="boundariesCont" class="row" style="display:none">
-            <div class="col-md-6">
-                <h3>Investment </h3>
-                <ul id='boundariesinvestmentlist' class="list-group">
-
-                </ul>
-
-            </div>
-
-            <div class="col-md-6">
-                <h3>Tax Income (Total)</h3>
-
-                <div id="taxMap" class="map"></div>
-                <p><small>Tax income is computed for Commerce, Industry and Housing systems. Tax rate yearly is 25% of
-                        valuation for commerical, 18% of valuation for hosing, 20% of valuation for Industrial systems.</small></p>
-            </div>
 
         </div>
         <br>
-        <hr>
+
+        <div id="balance-sheet" class="row">
+            <div class="col-md-12">
+                <h3 id="designName">Project Distribution</h3>
+                <small>A distribution of projects (not policies) proposed in the design is shown below. </small><br><br>
+            </div>
+            <div class="col-md-4">
+                <h4>Investments</h4>
+                <div id="investmentMap" class="map"></div>
+            </div>
+            <div class="col-md-4">
+                <h4>Income</h4>
+                <div id="incomeMap" class="map"></div>
+            </div>
+            <div class="col-md-4">
+                <h4>Maintainence</h4>
+                <div id="maintainenceMap" class="map"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p><small id="gridsizecont"></small></p>
+            </div>
+            <div class="col-md-6">
+                <div id="yearlySliderCont" style="display:none"><br>
+                    <p class='ionslider'><input type="text" id="yearly-slider" name="mapslider" value="" /></p>
+                </div>
+            </div>
+        </div>
         <br>
+
         <div class="row">
             <div class="col-md-6">
             </div>
@@ -114,39 +122,36 @@
         </div>
 
         <br>
-
-        <div id="balance-sheet" class="row">
-            <div class="col-md-12">
-                <h3 id="designName">Project Distribution</h3>
-                <small>A distribution of projects (not policies) proposed is shown below. </small><br><br>
-            </div>
-            <div class="col-md-4">
-                <h4>Investments</h4>
-                <div id="investmentMap" class="map"></div>
-            </div>
-            <div class="col-md-4">
-                <h4>Income</h4>
-                <div id="incomeMap" class="map"></div>
-            </div>
-            <div class="col-md-4">
-                <h4>Maintainence</h4>
-                <div id="maintainenceMap" class="map"></div>
-            </div>
-        </div>
-        <div class="row">
+        <div id="boundariesCont" class="row" style="display:none">
             <div class="col-md-6">
-                <p><small id="gridsizecont"></small></p>
-            </div>
-            <div class="col-md-6">
-                <div id="yearlySliderCont" style="display:none"><br>
-                    <p class='ionslider'><input type="text" id="yearly-slider" name="mapslider" value="" /></p>
-                </div>
-            </div>
-        </div>
+                <h3>Investment </h3>
 
+                <table id="boundaries_investment_tables" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Boundary Name</th>
+                            <th>Investment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="col-md-6">
+                <h3>Tax Income (Total)</h3>
+
+                <div id="taxMap" class="map"></div>
+                <p><small>Tax income is computed for Commerce, Industry and Housing systems. Tax rate yearly is 25% of
+                        valuation for commerical, 18% of valuation for hosing, 20% of valuation for Industrial systems.</small></p>
+            </div>
+
+        </div>
         <br>
         <hr>
         <br>
+
         <div class='row'>
             <div class='col-md-6'>
                 <h3>Financials</h3>
@@ -192,11 +197,14 @@
                 <h4>Investments</h4>
                 <table id="investments" class="hor-minimalist-b">
                     <thead>
-                        <tr class='blank'>&nbsp;&nbsp;</tr>
+                        <!-- <tr class='blank'>&nbsp;&nbsp;</tr> -->
                     </thead>
                     <tbody>
-                        <tr class='blank'>&nbsp;&nbsp;</tr>
+                        <!-- <tr class='blank'>&nbsp;&nbsp;</tr> -->
                     </tbody>
+                    <tfoot>
+                        <!-- <tr class='blank'>&nbsp;&nbsp;</tr> -->
+                    </tfoot>
                 </table>
                 <br>
                 <h4>Income</h4>
@@ -321,6 +329,7 @@
     <script type="text/javascript" src="assets/js/ion.rangeSlider.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap-editable.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="assets/js/colors.js"></script>
     <script type="text/javascript" src="assets/js/leaflet.js"></script>
     <script type="text/javascript" src="assets/js/choropleth.js"></script>
@@ -340,7 +349,7 @@
         var sysGrids;
         var diagGrids;
 
-        var numYears = 17; // number of colums; 
+        var numYears = 30; // number of colums; 
         function miniMapstyleComp(feature) {
             // console.log(feature.properties)
             var curFeature = feature.geometry.type;
@@ -469,6 +478,7 @@
                         if ((number == 1000) && (i < abbrev.length - 1)) {
                             number = 1;
                             i++;
+                            f
                         }
                         number += abbrev[i];
                         break;
@@ -738,8 +748,12 @@
             // console.log(diagGJ);
             // iterate over systems to build the table. 
 
-            $("#investments").find("tbody>tr:gt(0)").remove();
-            $("#investments").find("thead>tr:gt(0)").remove();
+            // $("#investments").find("tbody>tr:gt(0)").remove();
+            // $("#investments").find("thead>tr:gt(0)").remove();
+
+            $("#investments > tbody").empty();
+            $("#investments > thead").empty();
+            $("#investments > tfoot").empty();
 
             $("#income").find("tbody>tr:gt(0)").remove();
             $("#income").find("thead>tr:gt(0)").remove();
@@ -761,13 +775,13 @@
                     var yrCounter = 0
                     if (headcounter === 0) { // header row
                         var rowHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
+                            "<tr><th class='header initCol'>Diagram Name</th><th class='unitsheader'>Units</th><th class='fundingheader'>Funding</th><th class='systemheader'>System</th>";
                         var rHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader'>Units</th><th class='fundingheader'>Funding</th><th class='systemheader'>System</th>";
                         var mHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader'>Units</th><th class='fundingheader'>Funding</th><th class='systemheader'>System</th>";
                         var npvHTML =
-                            "<tr><th class='header initCol'></th><th class='unitsheader hidden'></th><th class='fundingheader hidden'></th>";
+                            "<tr><th class='header initCol'></th><th class='unitsheader'>Units</th><th class='fundingheader'>Funding</th><th class='systemheader'>System</th>";
 
                         for (var g = 0; g < numYears; g++) {
                             if (g < numYears - 2) {
@@ -784,9 +798,9 @@
                                     mHTML += "<th class='header'>Total</th>";
                                     npvHTML += "<th class='header'>Total</th>";
                                 } else {
-                                    rowHTML += "<th class='header'>&nbsp;</th>";
-                                    rHTML += "<th class='header'></th>";
-                                    mHTML += "<th class='header'></th>";
+                                    // rowHTML += "<th class='header'>&nbsp;</th>";
+                                    // rHTML += "<th class='header'></th>";
+                                    // mHTML += "<th class='header'></th>";
                                     npvHTML += "<th class='header'>NPV</th>";
                                     // rHTML += "<th>Annual Income (3% growth)</th>";
                                 }
@@ -796,7 +810,8 @@
                         rHTML += "</tr>";
                         mHTML += "</tr>";
                         npvHTML += "</tr>";
-                        $('#investments thead>tr:last').after(rowHTML);
+
+                        $('#investments > thead').append(rowHTML);
                         $('#income thead>tr:last').after(rHTML);
                         $('#npv thead>tr:last').after(npvHTML);
                         $('#maintainence thead>tr:last').after(mHTML);
@@ -805,21 +820,20 @@
 
                     // add system row 
 
-                    var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" +
-                        cursys.sysname + "</td>";
+                    // var sysrowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" + cursys.sysname + "</td>";
                     // add system row 
-                    var incomerowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" +
-                        cursys.sysname + "&nbsp;<sup id=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
-                    for (var g1 = 0; g1 < numYears; g1++) {
-                        sysrowHTML += "<td class='sysrow'>&nbsp;</td>";
-                        incomerowHTML += "<td class='sysrow'>&nbsp;</td>";
-                    }
-                    sysrowHTML += "</tr>";
+                    // var incomerowHTML = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol sysrow sysheader'>" +
+                    // cursys.sysname + "&nbsp;<sup id=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
+                    // for (var g1 = 0; g1 < numYears; g1++) {
+                    // sysrowHTML += "<td class='sysrow'>&nbsp;</td>";
+                    // incomerowHTML += "<td class='sysrow'>&nbsp;</td>";
+                    // }
+                    // sysrowHTML += "</tr>";
 
-                    $('#investments tbody>tr:last').after(sysrowHTML);
-                    $('#income tbody>tr:last').after(incomerowHTML);
-                    $('#npv tbody>tr:last').after(sysrowHTML);
-                    $('#maintainence tbody>tr:last').after(sysrowHTML);
+                    // $('#investments tbody>tr:last').after(sysrowHTML);
+                    // $('#income tbody>tr:last').after(incomerowHTML);
+                    // $('#npv tbody>tr:last').after(sysrowHTML);
+                    // $('#maintainence tbody>tr:last').after(sysrowHTML);
                     var diaglen = cursys.diagrams.length;
 
                     for (var p = 0; p < diaglen; p++) {
@@ -832,9 +846,11 @@
                             // var curdiagname = curdiag.
                             var diagrowHTMLinvest = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" +
                                 curdiagid + "'" +
-                                ">" + curdiagprops.fundingtype + "</td>";
+                                ">" + curdiagprops.fundingtype + "</td>" + "<td class=" + "system-" +
+                                curdiagid + "'" +
+                                ">" + cursys.sysname + "<sup class=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                             yrCounter = 0;
                             for (var g2 = 0; g2 < numYears; g2++) {
                                 if (g2 < numYears - 2) {
@@ -846,19 +862,24 @@
                                     if (g2 == (numYears - 1)) {
                                         diagrowHTMLinvest += "<td id=" + "'" + curdiagid + "-all-invest" + "'" + ">" +
                                             "0.00" + "</td>";
-                                    } else if (g2 == (numYears - 2)) {
-                                        diagrowHTMLinvest += "<td>" + "" + "</td>";
                                     }
+                                    // else if (g2 == (numYears - 2)) {
+                                    // diagrowHTMLinvest += "<td>" + "" + "</td>";
+                                    // }
                                 }
                             }
                             diagrowHTMLinvest += "</tr>";
-                            $('#investments tbody>tr:last').after(diagrowHTMLinvest);
+
+
+                            $('#investments > tbody').append(diagrowHTMLinvest);
 
                             var diagrowHTMLincome = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" +
                                 curdiagid + "'" +
-                                ">" + curdiagprops.fundingtype + "</td>";
+                                ">" + curdiagprops.fundingtype + "</td>" + "<td class=" + "system-" +
+                                curdiagid + "'" +
+                                ">" + cursys.sysname + "<sup class=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                             yrCounter = 0
                             for (var g3 = 0; g3 < numYears; g3++) {
                                 if (g3 < numYears - 2) {
@@ -870,19 +891,22 @@
                                     if (g3 == (numYears - 1)) {
                                         diagrowHTMLincome += "<td id=" + "'" + curdiagid + "-total-income" + "'" + ">" +
                                             "0.00" + "</td>";
-                                    } else if (g3 == (numYears - 2)) {
-                                        // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
-                                        diagrowHTMLincome += "<td>" + "" + "</td>";
                                     }
+                                    // else if (g3 == (numYears - 2)) {
+                                    // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
+                                    // diagrowHTMLincome += "<td>" + "" + "</td>";
+                                    // }
                                 }
                             }
                             diagrowHTMLincome += "</tr>";
                             $('#income tbody>tr:last').after(diagrowHTMLincome);
                             var diagrowHTMLnpv = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" +
                                 curdiagid + "'" +
-                                ">" + curdiagprops.fundingtype + "</td>";
+                                ">" + curdiagprops.fundingtype + "</td>" + "<td class=" + "system-" +
+                                curdiagid + "'" +
+                                ">" + cursys.sysname + "<sup class=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                             yrCounter = 0;
                             for (var g4 = 0; g4 < numYears; g4++) {
                                 if (g4 < (numYears - 2)) {
@@ -907,9 +931,11 @@
 
                             var diagrowHTMLmaint = "<tr class=" + "'" + cursys.id + "'" + "><td class='initCol'>" +
                                 curdiagprops.description + "<br>(" + projectorpolicy + ")</td>" + "<td class=" +
-                                "'hidden units-" + curdiagid + "'" + "></td>" + "<td class=" + "hidden funding-" +
+                                "'units-" + curdiagid + "'" + "></td>" + "<td class=" + "funding-" +
                                 curdiagid + "'" +
-                                ">" + curdiagprops.fundingtype + "</td>";
+                                ">" + curdiagprops.fundingtype + "</td>" + "<td class=" + "system-" +
+                                curdiagid + "'" +
+                                ">" + cursys.sysname + "<sup class=" + "'yeild-" + cursys.id + "'" + "></sup></td>";
                             yrCounter = 0;
                             for (var g5 = 0; g5 < numYears; g5++) {
                                 if (g5 < (numYears - 2)) {
@@ -921,10 +947,11 @@
                                     if (g5 == (numYears - 1)) {
                                         diagrowHTMLmaint += "<td id=" + "'" + curdiagid + "-total-maint" + "'" + ">" +
                                             "0.00" + "</td>";
-                                    } else if (g5 == (numYears - 2)) {
-                                        // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
-                                        diagrowHTMLmaint += "<td>" + "" + "</td>";
                                     }
+                                    // else if (g5 == (numYears - 2)) {
+                                    // diagrowHTMLincome += "<td id=" + "'" + curdiagid +"-annual-income"+"'" + ">" + "0.00m" + "</td>";
+                                    // diagrowHTMLmaint += "<td>" + "" + "</td>";
+                                    // }
                                 }
                             }
                             diagrowHTMLmaint += "</tr>";
@@ -936,16 +963,16 @@
 
                     if (h === (syslen - 1)) { // footer row
                         var rowHTML =
-                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td>";
+                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td><td class='footertotal systemfooter'></td>";
                         var rHTML =
-                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td>";
+                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td><td class='footertotal systemfooter'></td>";
                         var maintHTML =
-                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td>";
+                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td><td class='footertotal systemfooter'></td>";
                         var npvHTML =
-                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td>";
+                            "<tr class='footer'><td class='footertotal initCol'>Total</td><td class='footertotal unitsfooter'></td><td class='footertotal fundingfooter'></td><td class='footertotal systemfooter'></td>";
                         yrCounter = 0;
                         for (var g5 = 0; g5 < numYears; g5++) {
-                            if (g5 < numYears - 2) {
+                            if (g5 < numYears - 1) {
                                 var cYear = (startyear + yrCounter);
                                 rowHTML += "<td class='footertotal' id=" + "'" + cYear + "-total-investment" + "'" +
                                     ">0.00</td>";
@@ -956,12 +983,13 @@
                                 // npvHTML += "<td class='footertotal' id=" + "'" + cYear +"-total-npv"+"'" + ">0.00m</td>";
                                 yrCounter += 1;
                             }
+
                         }
                         rowHTML += "</tr>";
                         rHTML += "</tr>";
                         maintHTML += "</tr>";
                         npvHTML += "</tr>";
-                        $('#investments tbody>tr:last').after(rowHTML);
+                        $('#investments > tfoot').append(rowHTML);
                         $('#income tbody>tr:last').after(rHTML);
                         $('#maintainence tbody>tr:last').after(maintHTML);
                         // $('#npv tbody>tr:last').after(npvHTML);
@@ -998,6 +1026,7 @@
                 'timeline': JSON.stringify(timeline),
                 'startyear': JSON.stringify(startyear),
                 'bounds': bounds['bounds'],
+                'years': numYears,
                 'yeilds': JSON.stringify(yeilds)
             });
             areaWorker.addEventListener('message', function (e) {
@@ -1261,12 +1290,17 @@
                 var curBoundaryValue = bdata[x];
 
                 if (curBoundaryValue.totalInvestment == 0) {} else {
-                    var h = '<li class="list-group-item justify-content-between">' + curBoundaryValue.bname +
-                        '<span class="badge badge-default badge-pill">' + abbrNum(curBoundaryValue.totalInvestment, 2) +
-                        '</span></li>';
-                    $("#boundariesinvestmentlist").append(h);
+                    $('#boundaries_investment_tables > tbody:last-child').append('<tr><td>' + curBoundaryValue.bname +
+                        '</td><td>' + '<span class="badge badge-default badge-pill">' + abbrNum(curBoundaryValue.totalInvestment,
+                            2) +
+                        '</span></td></tr>');
+                    // var h = '<li class="list-group-item justify-content-between">' + curBoundaryValue.bname +
+                    //     '<span class="badge badge-default badge-pill">' + abbrNum(curBoundaryValue.totalInvestment, 2) +
+                    //     '</span></li>';
+                    // $("#boundariesinvestmentlist").append(h);
                 }
             }
+            $('#boundaries_investment_tables').DataTable();
         }
 
         var incomemap = L.map('incomeMap', {
@@ -1550,12 +1584,12 @@
 
                 var units = curInvestmentdata['units'];
                 if (units > 0) {
-                    $(".units-" + diagID).html(units + ' units');
+                    $(".units-" + diagID).html(units);
                 }
 
                 var curSysID = curInvestmentdata['sysid'];
                 if (yeildDict.hasOwnProperty(curSysID)) {} else {
-                    $("#yeild-" + curSysID).html(yeildLookup[y]);
+                    $(".yeild-" + curSysID).html(yeildLookup[y]);
                     yeildDict[curSysID] = true;
                 }
                 var tInvest;
@@ -1805,7 +1839,7 @@
             $("#systemsCB").html('');
             for (var x = 0; x < systems.length; x++) {
                 $('#systemsCB').append('<input name="sysCB" id=' + "'" + systems[x].id + "'" +
-                    'type="checkbox" checked /> <span class="square c-' + systems[x].syscolor.substring(1) +
+                    'type="checkbox" checked /> <span class="square c-' + systems[x].syscolor.substring(1).toLowerCase() +
                     '"></span>&nbsp;&nbsp;' + systems[x].sysname + '</input>&nbsp;&nbsp;');
             }
 
@@ -1920,7 +1954,7 @@
                 });
             }
         });
-        
+
         $('#download_data_as_csv').on('click', function (event) {
             convert_investment_to_csv();
 
@@ -1937,6 +1971,31 @@
                 }
             });
         });
+
+        //     var groupColumn = 3;
+        // var table = $('#investments').DataTable({"scrollX": true, "columnDefs": [
+        //         { "visible": false, "targets": groupColumn }
+        //     ],fixedHeader: {
+        //     header: false,
+        //     footer: true
+        // },
+        //     "order": [[ groupColumn, 'asc' ]],
+        //     "drawCallback": function ( settings ) {
+        //         var api = this.api();
+        //         var rows = api.rows( {page:'current'} ).nodes();
+        //         var last=null;
+
+        //         api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+        //             if ( last !== group ) {
+        //                 $(rows).eq( i ).before(
+        //                     '<tr class="group"><td colspan="5">'+group+'</td></tr>'
+        //                 );
+
+        //                 last = group;
+        //             }
+        //         } );
+        //     }
+        // } );
     </script>
 </body>
 

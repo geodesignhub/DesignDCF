@@ -94,7 +94,7 @@ var SMBBuildings = function () {
 }
 
 
-function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize, usersubyeilds) {
+function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize, usersubyeilds, numYears) {
 
     var whiteListedSysName = ['HDH', 'LDH', 'IND', 'COM', 'COMIND', 'HSNG', 'HSG', 'MXD'];
     var systemdetails = JSON.parse(systemdetails);
@@ -104,6 +104,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
     const usersubmittedyeilds = JSON.parse(usersubyeilds);
     var maxYearlyCost = 0;
     diagCosts = [];
+    var number_of_years = numYears;
+
     var gridTree = RTree();
     var grid = gridgridsize[0];
     var gridsize = gridgridsize[1];
@@ -311,7 +313,7 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 }
             }
             var totalIncome = 0;
-            for (var k = 0; k < 20; k++) {
+            for (var k = 0; k < number_of_years; k++) {
                 if (k == 0) {
                     lastIncome = tenpercentIncome;
                 }
@@ -329,8 +331,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             // var threepercentMaintainece = -1 * yearlyCost * 0.03;
             var threepercentMaintainece = yearlyCost * 0.03;
             var lastIncome;
-            for (var k7 = 0; k7 < 20; k7++) {
-                if (k7 < 19) {
+            for (var k7 = 0; k7 < number_of_years; k7++) {
+                if (k7 < number_of_years-1) {
                     var sYear = (startyear + k7);
                     curDiagDetails['maintainence'][sYear] = threepercentMaintainece;
                     totalMaintainence += threepercentMaintainece;
@@ -418,5 +420,5 @@ function generateGrid(bounds, startyear, systems) {
 }
 self.onmessage = function (e) {
     gridgridsize = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
-    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize, e.data.yeilds);
+    computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize, e.data.yeilds, e.data.years);
 }
