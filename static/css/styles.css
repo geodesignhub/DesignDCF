@@ -1107,6 +1107,12 @@ ul.input-list li {
     font-size: 15px;
 }
 
-
+tr.group td {
+    text-align: left;
+    font-size: 14px;
+}
+table.dataTable tbody td {
+    padding: 4px 4px;
+}
 
   
