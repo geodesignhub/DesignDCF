@@ -89,6 +89,8 @@
         <div class="row">
             <div class="col-md-6">
                 <p><small id="gridsizecont"></small></p>
+                <p><small id="selectedFeatureTitle"></small> <span id='selectedFeatureDesc'>Hover over a feature on any
+                        of the maps above to show details.</p>
             </div>
             <div class="col-md-6">
                 <div id="yearlySliderCont" style="display:none"><br>
@@ -370,7 +372,7 @@
                         if ((number == 1000) && (i < abbrev.length - 1)) {
                             number = 1;
                             i++;
-                            
+
                         }
                         number += abbrev[i];
                         break;
@@ -961,6 +963,7 @@
                     layer.bindPopup(ps);
                 }
             }).addTo(taxLayer);
+            taxmap.fitBounds(taxLayer.getBounds());
         }
 
         function renderBoundaryInvestment(boundarydata) {
@@ -1089,7 +1092,7 @@
                     },
                     onEachFeature: function (feature, layer) {
                         var ps = abbrNum(feature.properties.totalIncome, 2);
-                        layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+                        // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
                     }
                 }).addTo(incomeLayer);
             } else {
@@ -1114,11 +1117,12 @@
                         var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[
                             parseInt(yearlyOrTotal)] : 0;
                         ps = abbrNum(ps, 2);
-                        layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+                        // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
                     }
                 }).addTo(incomeLayer);
 
             }
+            incomemap.fitBounds(incomeLayer.getBounds());
 
 
         }
@@ -1149,8 +1153,11 @@
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = abbrNum(feature.properties.totalInvestment, 2);
-                     
-                        layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
+                        // layer.bindPopup(ps);
 
                     }
                 }).addTo(investmentLayer);
@@ -1179,12 +1186,16 @@
                         var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties
                             .investment[parseInt(yearlyOrTotal)].toLocaleString() : 0;
                         ps = abbrNum(ps, 2);
-
-                        layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
+                        layer.bindPopup(ps);
 
                     }
                 }).addTo(investmentLayer);
             }
+            investmentmap.fitBounds(investmentLayer.getBounds());
         }
 
         function plotMaintainenceMap(maintainenceGrid, yearlyOrTotal, stdVar) {
@@ -1198,7 +1209,7 @@
                         var m = feature.properties.totalMaintainence;
                         m = (m / stdVar) * 100;
 
-                        return (-1 * m)
+                        return m
                     },
                     scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
@@ -1216,8 +1227,11 @@
                         // console.log(ps);
                         ps = Math.abs(ps);
                         ps = abbrNum(ps, 2);
-
-                        layer.bindPopup("-" + ps +'<br>'+ feature.properties.diagrams);
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
+                        layer.bindPopup("-" + ps);
 
                     }
                 }).addTo(maintainenceLayer);
@@ -1228,7 +1242,7 @@
                             .maintainence[parseInt(yearlyOrTotal)] : 0;
                         m = (m / stdVar) * 100;
                         // console.log("maintainence: " + m);
-                        return (-1 * m)
+                        return m    
                     },
                     scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
                     // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
@@ -1247,12 +1261,78 @@
                         // console.log(ps);
                         ps = Math.abs(ps);
                         ps = abbrNum(ps, 2);
-                        layer.bindPopup("-" + ps +'<br>'+ feature.properties.diagrams);
-
+                        layer.bindPopup("-" + ps);
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
                     }
                 }).addTo(maintainenceLayer);
 
             }
+            maintainencemap.fitBounds(maintainenceLayer.getBounds());
+        }
+
+        function highlightFeature(e) {
+            var layer = e.target;
+            // if (!L.Browser.ie && !L.Browser.opera) {
+            //     layer.bringToFront();
+            // }
+                
+            displayFeatureProps(layer.feature.properties);
+        }
+
+        function getDiagramSystemTitle( diagramid) {
+            const ad = systems;
+            var sysName = 'NA';
+            var diagName = 'NA';
+            var syslen = ad.length;
+            loop1:
+                for (var x = 0; x < syslen; x++) {
+                    var cSys = ad[x];
+
+                    var all_current_Diagrams = cSys.diagrams;
+
+                    var allDiaglen = all_current_Diagrams.length;
+
+                    if (allDiaglen > 0) {
+                        loop2: for (var y = 0; y < allDiaglen; y++) {
+                            var cDiag = all_current_Diagrams[y];
+                            var diagram_ID = cDiag.features[0].properties.diagramid;
+                            if (diagramid == diagram_ID) {
+                                sysName = cDiag.features[0].properties.sysname;
+                                diagName = cDiag.features[0].properties.description;
+                                break loop1;
+                            }
+                        }
+                    }
+                }
+            const sys_title = ' | '+ sysName + ' ' + diagName;
+
+            return sys_title
+        }
+
+        function displayFeatureProps(data) {
+            console.log(data.diagrams);
+            const diagrams = data.diagrams;
+            const diaglen  = diagrams.length;
+            var diag_strings = '';
+            for (let index = 0; index < diaglen; index++) {
+                
+                const diag_id = diagrams[index];
+                diag_strings += getDiagramSystemTitle(diag_id);
+            }
+            $("#selectedFeatureDesc").html(diag_strings);
+            // $("#selectedFeatureDesc").html(data.worlddescription);
+        }
+
+        function resetHighlight(e) {
+            resetFeatureProps();
+        }
+
+        function resetFeatureProps(data) {
+            // $("#selectedFeatureTitle").html('');
+            $("#selectedFeatureDesc").html('Hover over a feature to show details');
         }
 
         function populateIncomeInvestment(investmentdata) {
@@ -1711,7 +1791,6 @@
                 npv_table.destroy();
             }
         }
-
     </script>
 </body>
 
