@@ -3,95 +3,7 @@ importScripts('../js/moment.min.js');
 importScripts('../js/rtree.min.js');
 
 
-// var COMBuilding = function () {
-//     const elevationoffset = 1;
-//     const comHeights = [14, 25, 30, 22, 28];
-//     const floorHeight = 5;
-//     const avgUnitsize = 50;
 
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + comHeights[Math.floor(Math.random() * comHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
-
-// var LDHousing = function () {
-//     const elevationoffset = 1;
-//     const ldhHeights = [1, 2, 3];
-//     const floorHeight = 5;
-//     const avgUnitsize = 100;
-
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + ldhHeights[Math.floor(Math.random() * ldhHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
-
-// var HDHousing = function () {
-//     const elevationoffset = 1;
-//     const hdhHeights = [36, 60, 90]; // in meters 
-//     const floorHeight = 5;
-//     const avgUnitsize = 50;
-
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + hdhHeights[Math.floor(Math.random() * hdhHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
-
-// var MXDBuildings = function () {
-//     const elevationoffset = 1;
-//     const mxdHeights = [9, 12, 8, 11]; // in meters 
-//     const floorHeight = 5;
-//     const avgUnitsize = 75;
-
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + mxdHeights[Math.floor(Math.random() * mxdHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
-
-// var LABBuildings = function () {
-//     const elevationoffset = 1;
-//     var labHeights = [10, 15];
-//     const floorHeight = 5;
-//     const avgUnitsize = 100;
-
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + labHeights[Math.floor(Math.random() * labHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
-
-// var SMBBuildings = function () {
-//     const elevationoffset = 1;
-//     var smbHeights = [2, 3, 5, 6, 7, 10];
-//     const floorHeight = 5;
-//     const avgUnitsize = 75;
-
-//     this.generateUnits = function (area) {
-//         var height = elevationoffset + smbHeights[Math.floor(Math.random() * smbHeights.length)];
-//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-//         var numUnitsperFloor = Math.round(area / avgUnitsize);
-//         var totalUnits = numUnitsperFloor * numFloors;
-//         return totalUnits;
-//     };
-// }
 
 
 function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize, usersubyeilds, numYears) {
@@ -358,17 +270,13 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
     self.close();
 }
 
-function generateGrid(bounds, startyear, systems) {
-    var sys = JSON.parse(systems);
-    var syslen = sys.length;
+function generateGrid(bounds) {
 
     function makeid() {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
         for (var i = 0; i < 6; i++)
             text += possible.charAt(Math.floor(Math.random() * possible.length));
-
         return text;
     }
     bounds = bounds.split(",").map(function (item) {
@@ -393,25 +301,10 @@ function generateGrid(bounds, startyear, systems) {
         "features": []
     };
     var gridlen = g.features.length;
-    // var initCosts = [];
-
-    var startyear = parseInt(startyear);
-    // for (var k1 = 0; k1 < 20; k1++) {
-    //     var sYear = (startyear + k1);
-    //     var x = {};
-    //     x[sYear] = 0;
-    //     initCosts.push(x);
-    // }
+    
     for (var index = 0; index < gridlen; index++) {
         var curgrid = g.features[index];
         curgrid.properties.id = makeid();
-
-        // for (var e = 0; e < syslen; e++) {
-        //     var cursys = sys[e];
-        //     var sysid = cursys.id;
-        //     var d = { 'maintainence': initCosts, 'income': initCosts, 'dcf': initCosts };
-        //     curgrid.properties[sysid] = d;
-        // }
         grid.features.push(curgrid);
     }
 
@@ -419,6 +312,7 @@ function generateGrid(bounds, startyear, systems) {
 
 }
 self.onmessage = function (e) {
-    gridgridsize = generateGrid(e.data.bounds, e.data.startyear, e.data.systems);
+    gridgridsize = generateGrid(e.data.bounds);
+    
     computeAreas(e.data.systemdetails, e.data.systems, e.data.timeline, e.data.startyear, gridgridsize, e.data.yeilds, e.data.years);
 }

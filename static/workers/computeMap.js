@@ -1,17 +1,59 @@
-function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsystems) {
+function getDiagramSystemTitle(allDiagrams, diagramid) {
+    var sysName = 'NA';
+    var diagName = 'NA';
+    var syslen = allDiagrams.length;
+    loop1:
+        for (var x = 0; x < syslen; x++) {
+            var cSys = allDiagrams[x];
+
+            var all_current_Diagrams = cSys.diagrams;
+
+            var allDiaglen = all_current_Diagrams.length;
+
+            if (allDiaglen > 0) {
+                loop2: for (var y = 0; y < allDiaglen; y++) {
+                    var cDiag = all_current_Diagrams[y];
+                    var diagram_ID = cDiag.features[0].properties.diagramid;
+                    if (diagramid == diagram_ID) {
+                        sysName = cDiag.features[0].properties.sysname;
+                        diagName = cDiag.features[0].properties.description;
+                        break loop1;
+                    }
+                }
+            }
+        }
+    const sys_title = sysName + ' ' + diagName;
+
+    return sys_title
+}
+
+function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsystems, all_diagrams) {
     var grid = JSON.parse(grid);
     var sysGrid = JSON.parse(sysGrid);
     var diagGrid = JSON.parse(diagGrid);
     var investmentdata = JSON.parse(investmentdata);
+    const allDiagrams = JSON.parse(all_diagrams);
 
     if (selectedsystems !== 'all') {
         var selectedsystems = JSON.parse(selectedsystems);
     }
 
-    var incomeGrid = { "type": "FeatureCollection", "features": [] };
-    var investmentGrid = { "type": "FeatureCollection", "features": [] };
-    var maintainenceGrid = { "type": "FeatureCollection", "features": [] };
-    var dcfGrid = { "type": "FeatureCollection", "features": [] };
+    var incomeGrid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+    var investmentGrid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+    var maintainenceGrid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+    var dcfGrid = {
+        "type": "FeatureCollection",
+        "features": []
+    };
 
     // console.log(JSON.stringify(grid));
     // console.log(JSON.stringify(sysGrid));
@@ -30,19 +72,25 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
     for (var sysid in sysGrid) { // iterate over the systems. 
         if ((selectedsystems == 'all') || (selectedsystems.includes(sysid))) { // this system is in the filtered list. 
             if (sysGrid.hasOwnProperty(parseInt(sysid))) {
-                var filteredinvestmentData = investmentdata.filter(function(el) {
+                var filteredinvestmentData = investmentdata.filter(function (el) {
                     return el.sysid == parseInt(sysid);
                 }); // filtered investment data has only the diagrams for this system. 
-                for (var i1 = 0; i1 < filteredinvestmentData.length; i1++) { // loop over the investment data. 
+                const filtered_investmentdata_length = filteredinvestmentData.length;
+                for (var i1 = 0; i1 < filtered_investmentdata_length; i1++) { // loop over the investment data. 
                     var curData = filteredinvestmentData[i1]; // current investment data
                     var diagID = curData.id; // diagram id of the current investment
+                    const diagram_name_sys = getDiagramSystemTitle(allDiagrams, diagID);
+                    // console.log(diagram_name_sys);
+                    var name_added = 0;
                     var filteredIDs = diagGrid[diagID]; // the grid IDs that this diagram intersects. 
                     var filteredGridlen = filteredIDs.length; // number of grid cells that this diagram intersects
                     for (var i2 = 0; i2 < filteredGridlen; i2++) {
-                        var curDiagGrid = filteredIDs[i2]; // the unique ID of the idagram. 
-                        for (var i3 = 0; i3 < grid.features.length; i3++) {
+                        // var curDiagGrid = filteredIDs[i2]; // the unique ID of the idagram. 
+                        var prop_added = 0;
+                        for (var i3 = 0; i3 < gridlen; i3++) {
                             var curGrid = grid.features[i3];
                             var curGridID = curGrid.properties.id;
+
                             if (filteredIDs.includes(curGridID)) { // while looping over the master grid, check if this ID needs to be included. 
                                 var investGrid;
                                 var totalInvest = curData.totalInvestment;
@@ -54,15 +102,18 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                 var maintGrid;
                                 var yearlyMaintainence = curData.maintainence;
 
+
                                 if (addedIDs.includes(curGridID)) { // someone has already added the data, retrive it and work with it. 
                                     investGrid = finalInvestmentGrid[curGridID];
                                     var newtotalInvest = (curData.totalInvestment / filteredGridlen);
                                     var origInvest = investGrid.properties.totalInvestment;
+
                                     investGrid.properties.totalInvestment = (origInvest + newtotalInvest);
 
                                     incGrid = finalIncomeGrid[curGridID];
                                     var newtotalIncome = (curData.income['total'] / filteredGridlen);
                                     var origIncome = incGrid.properties.totalIncome;
+
                                     incGrid.properties.totalIncome = (origIncome + newtotalIncome);
 
                                     maintGrid = finalMaintainenceGrid[curGridID];
@@ -74,7 +125,7 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     var origYearlyInvestment = investGrid.properties.investment;
                                     var curYearlyInvestment = curData.investment;
                                     var newYearlyInvestment = {};
-                                    Object.keys(origYearlyInvestment).map(function(a) {
+                                    Object.keys(origYearlyInvestment).map(function (a) {
                                         newYearlyInvestment[a] = (origYearlyInvestment[a] / filteredGridlen) + (curYearlyInvestment[a] / filteredGridlen)
                                     });
                                     investGrid.properties.investment = newYearlyInvestment;
@@ -82,7 +133,7 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     var origYearlyIncome = incGrid.properties.income;
                                     var curYearlyIncome = curData.income;
                                     var newYearlyIncome = {};
-                                    Object.keys(origYearlyIncome).map(function(a) {
+                                    Object.keys(origYearlyIncome).map(function (a) {
                                         newYearlyIncome[a] = (origYearlyIncome[a] / filteredGridlen) + (curYearlyIncome[a] / filteredGridlen)
                                     });
                                     incGrid.properties.income = newYearlyIncome;
@@ -90,12 +141,16 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
                                     var origYearlyMaintainence = maintGrid.properties.maintainence;
                                     var curYearlyMaintainence = curData.maintainence;
                                     var newYearlyMaintainence = {};
-                                    Object.keys(origYearlyMaintainence).map(function(a) {
+                                    Object.keys(origYearlyMaintainence).map(function (a) {
                                         newYearlyMaintainence[a] = (origYearlyMaintainence[a] / filteredGridlen) + (curYearlyMaintainence[a] / filteredGridlen)
                                     });
                                     maintGrid.properties.maintainence = newYearlyMaintainence;
 
                                 } else {
+
+                                    const x = (typeof curGrid.properties.diagrams !== 'undefined') ? (curGrid.properties.diagrams + diagram_name_sys) : diagram_name_sys;
+                                    curGrid.properties.diagrams = x;
+
                                     investGrid = curGrid;
                                     investGrid.properties.totalInvestment = (totalInvest / filteredGridlen);
                                     investGrid.properties.investment = yearlyInvestment;
@@ -167,7 +222,7 @@ function computeFinanceMaps(grid, sysGrid, diagGrid, investmentdata, selectedsys
 }
 
 
-self.onmessage = function(e) {
-    grid = computeFinanceMaps(e.data.grid, e.data.sysGrid, e.data.diagGrid, e.data.investmentdata, e.data.selectedsystems);
+self.onmessage = function (e) {
+    grid = computeFinanceMaps(e.data.grid, e.data.sysGrid, e.data.diagGrid, e.data.investmentdata, e.data.selectedsystems, e.data.allDiagrams);
 
 }
