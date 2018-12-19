@@ -3,95 +3,95 @@ importScripts('../js/moment.min.js');
 importScripts('../js/rtree.min.js');
 
 
-var COMBuilding = function () {
-    const elevationoffset = 1;
-    const comHeights = [14, 25, 30, 22, 28];
-    const floorHeight = 5;
-    const avgUnitsize = 50;
+// var COMBuilding = function () {
+//     const elevationoffset = 1;
+//     const comHeights = [14, 25, 30, 22, 28];
+//     const floorHeight = 5;
+//     const avgUnitsize = 50;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + comHeights[Math.floor(Math.random() * comHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + comHeights[Math.floor(Math.random() * comHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
-var LDHousing = function () {
-    const elevationoffset = 1;
-    const ldhHeights = [1, 2, 3];
-    const floorHeight = 5;
-    const avgUnitsize = 100;
+// var LDHousing = function () {
+//     const elevationoffset = 1;
+//     const ldhHeights = [1, 2, 3];
+//     const floorHeight = 5;
+//     const avgUnitsize = 100;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + ldhHeights[Math.floor(Math.random() * ldhHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + ldhHeights[Math.floor(Math.random() * ldhHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
-var HDHousing = function () {
-    const elevationoffset = 1;
-    const hdhHeights = [36, 60, 90]; // in meters 
-    const floorHeight = 5;
-    const avgUnitsize = 50;
+// var HDHousing = function () {
+//     const elevationoffset = 1;
+//     const hdhHeights = [36, 60, 90]; // in meters 
+//     const floorHeight = 5;
+//     const avgUnitsize = 50;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + hdhHeights[Math.floor(Math.random() * hdhHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + hdhHeights[Math.floor(Math.random() * hdhHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
-var MXDBuildings = function () {
-    const elevationoffset = 1;
-    const mxdHeights = [9, 12, 8, 11]; // in meters 
-    const floorHeight = 5;
-    const avgUnitsize = 75;
+// var MXDBuildings = function () {
+//     const elevationoffset = 1;
+//     const mxdHeights = [9, 12, 8, 11]; // in meters 
+//     const floorHeight = 5;
+//     const avgUnitsize = 75;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + mxdHeights[Math.floor(Math.random() * mxdHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + mxdHeights[Math.floor(Math.random() * mxdHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
-var LABBuildings = function () {
-    const elevationoffset = 1;
-    var labHeights = [10, 15];
-    const floorHeight = 5;
-    const avgUnitsize = 100;
+// var LABBuildings = function () {
+//     const elevationoffset = 1;
+//     var labHeights = [10, 15];
+//     const floorHeight = 5;
+//     const avgUnitsize = 100;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + labHeights[Math.floor(Math.random() * labHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + labHeights[Math.floor(Math.random() * labHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
-var SMBBuildings = function () {
-    const elevationoffset = 1;
-    var smbHeights = [2, 3, 5, 6, 7, 10];
-    const floorHeight = 5;
-    const avgUnitsize = 75;
+// var SMBBuildings = function () {
+//     const elevationoffset = 1;
+//     var smbHeights = [2, 3, 5, 6, 7, 10];
+//     const floorHeight = 5;
+//     const avgUnitsize = 75;
 
-    this.generateUnits = function (area) {
-        var height = elevationoffset + smbHeights[Math.floor(Math.random() * smbHeights.length)];
-        var numFloors = Math.round(height / floorHeight); // 5 meter per floor
-        var numUnitsperFloor = Math.round(area / avgUnitsize);
-        var totalUnits = numUnitsperFloor * numFloors;
-        return totalUnits;
-    };
-}
+//     this.generateUnits = function (area) {
+//         var height = elevationoffset + smbHeights[Math.floor(Math.random() * smbHeights.length)];
+//         var numFloors = Math.round(height / floorHeight); // 5 meter per floor
+//         var numUnitsperFloor = Math.round(area / avgUnitsize);
+//         var totalUnits = numUnitsperFloor * numFloors;
+//         return totalUnits;
+//     };
+// }
 
 
 function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize, usersubyeilds, numYears) {
@@ -207,39 +207,39 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
                 if ((sysName === 'HDH') || (sysName === 'HSNG') || (sysName === 'HSG')) {
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'one-star' in usersubmittedyeilds) ? usersubmittedyeilds['one-star'] : 10;
                     // yeild = 10; // housing yeild if 4
-                    var hdh = new HDHousing();
-                    units = hdh.generateUnits(totAreaM);
+                    // var hdh = new HDHousing();
+                    // units = hdh.generateUnits(totAreaM);
                 } else if (sysName === 'MXD') {
 
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
                     // yeild = 16;
-                    var mxd = new MXDBuildings();
-                    var units = mxd.generateUnits(totAreaM);
+                    // var mxd = new MXDBuildings();
+                    // var units = mxd.generateUnits(totAreaM);
                 } else if (sysName === 'LDH') {
-                    var ldh = new LDHousing();
-                    units = ldh.generateUnits(totAreaM);
+                    // var ldh = new LDHousing();
+                    // units = ldh.generateUnits(totAreaM);
 
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
                     // yeild = 12;
                 } else if ((sysName === 'COM') || (sysName === 'COMIND') || (sysName === 'IND')) {
-                    var com = new COMBuilding();
-                    units = com.generateUnits(totAreaM);
+                    // var com = new COMBuilding();
+                    // units = com.generateUnits(totAreaM);
                     yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'four-star' in usersubmittedyeilds) ? usersubmittedyeilds['four-star'] : 18;
                     // yeild = 18;
                 }
             } else if ((sysTag === 'Large buildings, Industry, commerce')) { // system not whitelisted
-                var lab = new LABBuildings();
-                units = lab.generateUnits(totAreaM);
+                // var lab = new LABBuildings();
+                // units = lab.generateUnits(totAreaM);
                 // yeild = 16;
                 yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
             } else if ((sysTag === 'Small buildings, low density housing')) { // system not whitelisted 
-                var smb = new SMBBuildings();
-                units = smb.generateUnits(totAreaM);
+                // var smb = new SMBBuildings();
+                // units = smb.generateUnits(totAreaM);
                 // yeild = 16;
 
                 yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'three-star' in usersubmittedyeilds) ? usersubmittedyeilds['three-star'] : 16;
             } else {
-                units = 0;
+                // units = 0;
                 // yeild = 12; // default yeild
 
                 yeild = (Object.keys(usersubmittedyeilds).length !== 0 && usersubmittedyeilds.constructor === Object && 'two-star' in usersubmittedyeilds) ? usersubmittedyeilds['two-star'] : 12;
@@ -294,8 +294,8 @@ function computeAreas(systemdetails, systems, timeline, startyear, gridgridsize,
             curDiagDetails['maintainence'] = {};
             curDiagDetails['yeild'] = yeild;
 
-            curDiagDetails['units'] = units;
-            curDiagDetails['name'] = units;
+            // curDiagDetails['units'] = units;
+            // curDiagDetails['name'] = units;
 
             yearlyCost = parseFloat(totalCost / numYears);
             maxYearlyCost = (yearlyCost > maxYearlyCost) ? yearlyCost : maxYearlyCost;
