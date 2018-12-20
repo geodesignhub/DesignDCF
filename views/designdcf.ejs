@@ -67,43 +67,50 @@
                     as a CSV file.</p><br><br>
             </div>
         </div>
-        <br>
+
         <div id="balance-sheet" class="row">
             <div class="col-md-12">
                 <h3 id="designName">Project Distribution</h3>
                 <small>A distribution of projects (not policies) proposed in the design is shown below. </small><br><br>
             </div>
-            <div class="col-md-4">
-                <h4>Investments</h4>
+            <div class="col-md-12">
+                <h4>Investment Grid</h4>
                 <div id="investmentMap" class="map"></div>
+                <p><small id="gridsizecont"></small></p>
+                <p><small id="selectedFeatureTitle"></small> <span id='selectedFeatureDesc'>Hover over a feature on any
+                        of the maps above to show details.</p>
             </div>
-            <div class="col-md-4">
+
+            <!-- <div class="col-md-4">
                 <h4>Income</h4>
                 <div id="incomeMap" class="map"></div>
             </div>
             <div class="col-md-4">
                 <h4>Maintainence</h4>
                 <div id="maintainenceMap" class="map"></div>
-            </div>
+            </div> -->
         </div>
+
         <div class="row">
+
             <div class="col-md-6">
-                <p><small id="gridsizecont"></small></p>
-                <p><small id="selectedFeatureTitle"></small> <span id='selectedFeatureDesc'>Hover over a feature on any
-                        of the maps above to show details.</p>
             </div>
             <div class="col-md-6">
-                <div id="yearlySliderCont" style="display:none"><br>
+
+                <div id="yearlySliderCont" class="pull-right" style="display:none"><br>
                     <p class='ionslider'><input type="text" id="yearly-slider" name="mapslider" value="" /></p>
                 </div>
+                <br><br>
             </div>
         </div>
-        <br>
+
         <div class="row">
+
             <div class="col-md-6">
             </div>
-            <div class="col-md-6 text-right">
-                <div id='yearlyortotal' class="btn-group" data-toggle="buttons">
+            <div class="col-md-6">
+
+                <div id='yearlyortotal' class="btn-group pull-right" data-toggle="buttons">
                     <label class="btn btn-default active">
                         <input type="radio" id='totalmap' name="mapdisplay" value="total" checked="">Total
                     </label>
@@ -111,33 +118,42 @@
                         <input type="radio" id='yearlymap' name="mapdisplay" value="yearly">Yearly
                     </label>
                 </div>
-                <p><span id="loadingGIFMap"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatusMap">Processing</span>...</span>
+                <br><br><br>
+
+                <p class="pull-right"><span id="loadingGIFMap"><img src="/assets/loaders/loading.gif">&nbsp;<span id="procstatusMap">Processing</span>...</span><br>
                 </p>
             </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="boundariesCont">
+                    <h4>Investment by boundary table (Total)</h4>
+                    <table id="boundaries_investment_tables" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Boundary Name</th>
+                                <th>Investment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="boundariesCont">
+                    <h4>Investment by boundary map (Total)</h4>
+                    <div id="taxMap" class="map"></div>
+                </div>
+            </div>
+
         </div>
         <br>
-        <div id="boundariesCont" class="row" style="display:none">
-            <div class="col-md-6">
-                <h3>Investment </h3>
-                <table id="boundaries_investment_tables" class="table table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Boundary Name</th>
-                            <th>Investment</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <h3>Tax Income (Total)</h3>
-                <div id="taxMap" class="map"></div>
-                <p><small>Tax income is computed for Commerce, Industry and Housing systems. Tax rate yearly is 25% of
-                        valuation for commerical, 18% of valuation for hosing, 20% of valuation for Industrial systems.</small></p>
-            </div>
-        </div>
         <br>
+
         <hr>
         <br>
         <div class='row'>
@@ -354,7 +370,7 @@
         var investmentdata;
 
         if (boundaries.features.length > 0) {
-            $("#boundariesCont").show();
+            $(".boundariesCont").show();
         }
         var startyear = moment(projectdetails['startdate']).year();
 
@@ -408,9 +424,9 @@
                 prettify_enabled: true,
                 onFinish: function (data) {
                     var tY = parseInt($("#yearly-slider").val());
-                    plotIncomeMap(incomeGrid, tY, standardizationVar);
+                    // plotIncomeMap(incomeGrid, tY, standardizationVar);
                     plotInvestmentMap(investmentGrid, tY, standardizationVar);
-                    plotMaintainenceMap(maintainenceGrid, tY, standardizationVar);
+                    // plotMaintainenceMap(maintainenceGrid, tY, standardizationVar);
                 }
             });
         }
@@ -842,9 +858,9 @@
                     incomeGrid = JSON.parse(e.data.incomeGrid);
                     investmentGrid = JSON.parse(e.data.investmentGrid);
                     maintainenceGrid = JSON.parse(e.data.maintainenceGrid);
-                    plotIncomeMap(incomeGrid, totalorYearly, stdVar);
+                    // plotIncomeMap(incomeGrid, totalorYearly, stdVar);
                     plotInvestmentMap(investmentGrid, totalorYearly, stdVar);
-                    plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
+                    // plotMaintainenceMap(maintainenceGrid, totalorYearly, stdVar);
                     // paint on map.
                     $("#loadingGIFMap").hide();
 
@@ -888,9 +904,9 @@
                     var incg = JSON.parse(e.data.incomeGrid);
                     var invg = JSON.parse(e.data.investmentGrid);
                     var maintg = JSON.parse(e.data.maintainenceGrid);
-                    plotIncomeMap(incg, 'all', standardizationVar);
+                    // plotIncomeMap(incg, 'all', standardizationVar);
                     plotInvestmentMap(invg, 'all', standardizationVar);
-                    plotMaintainenceMap(maintg, 'all', standardizationVar);
+                    // plotMaintainenceMap(maintg, 'all', standardizationVar);
 
                     $("#loadingGIF").hide();
                     // paint on map.
@@ -932,7 +948,7 @@
                 } else {
                     // console.log(e.data.boundaryValue);
                     renderBoundaryInvestment(JSON.parse(e.data.boundaryValue));
-                    renderBoundaryTaxMap(JSON.parse(e.data.newboundaries))
+                    renderBoundaryInvestmentMap(JSON.parse(e.data.newboundaries))
                     $("#loadingGIF").hide();
                     // paint on map.
                 }
@@ -940,12 +956,12 @@
 
         }
 
-        function renderBoundaryTaxMap(newboundaries) {
+        function renderBoundaryInvestmentMap(newboundaries) {
             taxLayer.clearLayers();
 
             L.choropleth(newboundaries, {
                 valueProperty: function (feature) {
-                    var m = feature.properties.totalTax;
+                    var m = feature.properties.totalInvestment;
                     // m = (m / stdVar) * 100;
                     return m;
                 },
@@ -959,7 +975,9 @@
                     fillOpacity: 0.8
                 },
                 onEachFeature: function (feature, layer) {
-                    var ps = abbrNum(feature.properties.totalTax, 2);
+
+                    var ps = abbrNum(feature.properties.totalInvestment, 2);
+
                     layer.bindPopup(ps);
                 }
             }).addTo(taxLayer);
@@ -996,20 +1014,20 @@
             });
         }
 
-        var incomemap = L.map('incomeMap', {
-            'zoomControl': false,
-            'dragging': false,
-            'touchZoom': false,
-            'scrollWheelZoom': false,
-            'doubleClickZoom': false,
-            'attributionControl': false
-        });
-        var incomeBaseLayer = L.tileLayer(
-            'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-                maxZoom: 18,
-            }).addTo(incomemap);
-        var incomeLayer = L.featureGroup().addTo(incomemap);
+        // var incomemap = L.map('incomeMap', {
+        //     'zoomControl': false,
+        //     'dragging': false,
+        //     'touchZoom': false,
+        //     'scrollWheelZoom': false,
+        //     'doubleClickZoom': false,
+        //     'attributionControl': false
+        // });
+        // var incomeBaseLayer = L.tileLayer(
+        //     'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        //         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+        //         maxZoom: 18,
+        //     }).addTo(incomemap);
+        // var incomeLayer = L.featureGroup().addTo(incomemap);
 
 
         var taxmap = L.map('taxMap', {
@@ -1041,20 +1059,20 @@
             }).addTo(investmentmap);
         var investmentLayer = L.featureGroup().addTo(investmentmap);
 
-        var maintainencemap = L.map('maintainenceMap', {
-            'zoomControl': false,
-            'dragging': false,
-            'touchZoom': false,
-            'scrollWheelZoom': false,
-            'doubleClickZoom': false,
-            'attributionControl': false
-        });
-        var maintainenceBaseLayer = L.tileLayer(
-            'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-                maxZoom: 18,
-            }).addTo(maintainencemap);
-        var maintainenceLayer = L.featureGroup().addTo(maintainencemap);
+        // var maintainencemap = L.map('maintainenceMap', {
+        //     'zoomControl': false,
+        //     'dragging': false,
+        //     'touchZoom': false,
+        //     'scrollWheelZoom': false,
+        //     'doubleClickZoom': false,
+        //     'attributionControl': false
+        // });
+        // var maintainenceBaseLayer = L.tileLayer(
+        //     'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        //         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+        //         maxZoom: 18,
+        //     }).addTo(maintainencemap);
+        // var maintainenceLayer = L.featureGroup().addTo(maintainencemap);
 
 
         var bnds = bounds['bounds'];
@@ -1063,71 +1081,72 @@
         var northEast = L.latLng(latLngs[3], latLngs[2]);
         var mB = new L.latLngBounds(southWest, northEast);
 
-        incomemap.fitBounds(mB);
+        // incomemap.fitBounds(mB);
         investmentmap.fitBounds(mB);
-        maintainencemap.fitBounds(mB);
+        // maintainencemap.fitBounds(mB);
         taxmap.fitBounds(mB);
 
-        function plotIncomeMap(incomeGrid, yearlyOrTotal, stdVar) {
+        // function plotIncomeMap(incomeGrid, yearlyOrTotal, stdVar) {
 
-            incomeLayer.clearLayers();
-            if (yearlyOrTotal === 'all') {
+        //     incomeLayer.clearLayers();
+        //     if (yearlyOrTotal === 'all') {
 
-                L.choropleth(incomeGrid, {
-                    valueProperty: function (feature) {
-                        var m = feature.properties.totalIncome;
-                        m = (m / stdVar) * 100;
+        //         L.choropleth(incomeGrid, {
+        //             valueProperty: function (feature) {
+        //                 var m = feature.properties.totalIncome;
+        //                 m = (m / stdVar) * 100;
 
-                        return m;
-                    },
+        //                 return m;
+        //             },
 
-                    scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
-                    // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                    steps: 5,
-                    mode: 'q',
-                    style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
-                    },
-                    onEachFeature: function (feature, layer) {
-                        var ps = abbrNum(feature.properties.totalIncome, 2);
-                        // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
-                    }
-                }).addTo(incomeLayer);
-            } else {
-                L.choropleth(incomeGrid, {
-                    valueProperty: function (feature) {
-                        var i = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[
-                            parseInt(yearlyOrTotal)] : 0;
-                        i = (i / stdVar) * 100;
-                        // console.log("income: " + i);
-                        return i
-                    },
-                    scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
-                    // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                    steps: 5,
-                    mode: 'q',
-                    style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
-                    },
-                    onEachFeature: function (feature, layer) {
-                        var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[
-                            parseInt(yearlyOrTotal)] : 0;
-                        ps = abbrNum(ps, 2);
-                        // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
-                    }
-                }).addTo(incomeLayer);
+        //             scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+        //             // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+        //             steps: 5,
+        //             mode: 'q',
+        //             style: {
+        //                 color: '#fff',
+        //                 weight: 2,
+        //                 fillOpacity: 0.8
+        //             },
+        //             onEachFeature: function (feature, layer) {
+        //                 var ps = abbrNum(feature.properties.totalIncome, 2);
+        //                 // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+        //             }
+        //         }).addTo(incomeLayer);
+        //     } else {
+        //         L.choropleth(incomeGrid, {
+        //             valueProperty: function (feature) {
+        //                 var i = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[
+        //                     parseInt(yearlyOrTotal)] : 0;
+        //                 i = (i / stdVar) * 100;
+        //                 // console.log("income: " + i);
+        //                 return i
+        //             },
+        //             scale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], //greens
+        //             // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+        //             steps: 5,
+        //             mode: 'q',
+        //             style: {
+        //                 color: '#fff',
+        //                 weight: 2,
+        //                 fillOpacity: 0.8
+        //             },
+        //             onEachFeature: function (feature, layer) {
+        //                 var ps = (feature.properties.income[parseInt(yearlyOrTotal)]) ? feature.properties.income[
+        //                     parseInt(yearlyOrTotal)] : 0;
+        //                 ps = abbrNum(ps, 2);
+        //                 // layer.bindPopup(ps +'<br>'+ feature.properties.diagrams);
+        //             }
+        //         }).addTo(incomeLayer);
 
-            }
-            incomemap.fitBounds(incomeLayer.getBounds());
+        //     }
+        //     incomemap.fitBounds(incomeLayer.getBounds());
 
 
-        }
+        // }
 
         function plotInvestmentMap(investmentGrid, yearlyOrTotal, stdVar) {
+
             investmentLayer.clearLayers();
 
             // var plotValue = (yearlyOrTotal === 'all') ? 'totalInvestment': yearlyOrTotal;
@@ -1153,11 +1172,19 @@
                         // layer.bindPopup('District ' + feature.properties.id + '<br>' +
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = abbrNum(feature.properties.totalInvestment, 2);
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight
-                        });
-                        // layer.bindPopup(ps);
+
+                        const diagrams = feature.properties.diagrams;
+                        const diaglen = diagrams.length;
+                        var diag_strings = '';
+                        for (let index = 0; index < diaglen; index++) {
+                            const diag_id = diagrams[index];
+                            diag_strings += getDiagramSystemTitle(diag_id);
+                        }
+
+
+
+                        ps = abbrNum(ps, 2);
+                        layer.bindPopup(ps + ' ' + diag_strings);
 
                     }
                 }).addTo(investmentLayer);
@@ -1185,12 +1212,19 @@
                         //     feature.properties.totalInvestment.toLocaleString() + ' incidents');
                         var ps = (feature.properties.investment[parseInt(yearlyOrTotal)]) ? feature.properties
                             .investment[parseInt(yearlyOrTotal)].toLocaleString() : 0;
+
+                        const diagrams = feature.properties.diagrams;
+                        const diaglen = diagrams.length;
+                        var diag_strings = '';
+                        for (let index = 0; index < diaglen; index++) {
+                            const diag_id = diagrams[index];
+                            diag_strings += getDiagramSystemTitle(diag_id);
+                        }
+
+
                         ps = abbrNum(ps, 2);
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight
-                        });
-                        layer.bindPopup(ps);
+                        layer.bindPopup(ps + ' ' + diag_strings);
+
 
                     }
                 }).addTo(investmentLayer);
@@ -1198,91 +1232,91 @@
             investmentmap.fitBounds(investmentLayer.getBounds());
         }
 
-        function plotMaintainenceMap(maintainenceGrid, yearlyOrTotal, stdVar) {
-            maintainenceLayer.clearLayers();
-            var plotValue = (yearlyOrTotal === 'all') ? 'totalMaintainence' : yearlyOrTotal;
+        // function plotMaintainenceMap(maintainenceGrid, yearlyOrTotal, stdVar) {
+        //     maintainenceLayer.clearLayers();
+        //     var plotValue = (yearlyOrTotal === 'all') ? 'totalMaintainence' : yearlyOrTotal;
 
-            if (yearlyOrTotal === 'all') {
+        //     if (yearlyOrTotal === 'all') {
 
-                L.choropleth(maintainenceGrid, {
-                    valueProperty: function (feature) {
-                        var m = feature.properties.totalMaintainence;
-                        m = (m / stdVar) * 100;
+        //         L.choropleth(maintainenceGrid, {
+        //             valueProperty: function (feature) {
+        //                 var m = feature.properties.totalMaintainence;
+        //                 m = (m / stdVar) * 100;
 
-                        return m
-                    },
-                    scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
-                    // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                    steps: 5,
-                    mode: 'q',
-                    style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
-                    },
-                    onEachFeature: function (feature, layer) {
-                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                        //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                        var ps = feature.properties.totalMaintainence;
-                        // console.log(ps);
-                        ps = Math.abs(ps);
-                        ps = abbrNum(ps, 2);
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight
-                        });
-                        layer.bindPopup("-" + ps);
+        //                 return m
+        //             },
+        //             scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+        //             // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+        //             steps: 5,
+        //             mode: 'q',
+        //             style: {
+        //                 color: '#fff',
+        //                 weight: 2,
+        //                 fillOpacity: 0.8
+        //             },
+        //             onEachFeature: function (feature, layer) {
+        //                 // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+        //                 //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+        //                 var ps = feature.properties.totalMaintainence;
+        //                 // console.log(ps);
+        //                 ps = Math.abs(ps);
+        //                 ps = abbrNum(ps, 2);
+        //                 layer.on({
+        //                     mouseover: highlightFeature,
+        //                     mouseout: resetHighlight
+        //                 });
+        //                 layer.bindPopup("-" + ps);
 
-                    }
-                }).addTo(maintainenceLayer);
-            } else {
-                L.choropleth(maintainenceGrid, {
-                    valueProperty: function (feature) {
-                        var m = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties
-                            .maintainence[parseInt(yearlyOrTotal)] : 0;
-                        m = (m / stdVar) * 100;
-                        // console.log("maintainence: " + m);
-                        return m    
-                    },
-                    scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
-                    // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
-                    steps: 5,
-                    mode: 'e',
-                    style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
-                    },
-                    onEachFeature: function (feature, layer) {
-                        // layer.bindPopup('District ' + feature.properties.id + '<br>' +
-                        //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
-                        var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties
-                            .maintainence[parseInt(yearlyOrTotal)].toLocaleString() : 0;
-                        // console.log(ps);
-                        ps = Math.abs(ps);
-                        ps = abbrNum(ps, 2);
-                        layer.bindPopup("-" + ps);
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight
-                        });
-                    }
-                }).addTo(maintainenceLayer);
+        //             }
+        //         }).addTo(maintainenceLayer);
+        //     } else {
+        //         L.choropleth(maintainenceGrid, {
+        //             valueProperty: function (feature) {
+        //                 var m = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties
+        //                     .maintainence[parseInt(yearlyOrTotal)] : 0;
+        //                 m = (m / stdVar) * 100;
+        //                 // console.log("maintainence: " + m);
+        //                 return m    
+        //             },
+        //             scale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'],
+        //             // scale: ['#dadaeb', '#bcbddc', '#9e9ac8', '#756bb1', '#54278f'], //purples
+        //             steps: 5,
+        //             mode: 'e',
+        //             style: {
+        //                 color: '#fff',
+        //                 weight: 2,
+        //                 fillOpacity: 0.8
+        //             },
+        //             onEachFeature: function (feature, layer) {
+        //                 // layer.bindPopup('District ' + feature.properties.id + '<br>' +
+        //                 //     feature.properties.totalMaintainence.toLocaleString() + ' incidents');
+        //                 var ps = (feature.properties.maintainence[parseInt(yearlyOrTotal)]) ? feature.properties
+        //                     .maintainence[parseInt(yearlyOrTotal)].toLocaleString() : 0;
+        //                 // console.log(ps);
+        //                 ps = Math.abs(ps);
+        //                 ps = abbrNum(ps, 2);
+        //                 layer.bindPopup("-" + ps);
+        //                 layer.on({
+        //                     mouseover: highlightFeature,
+        //                     mouseout: resetHighlight
+        //                 });
+        //             }
+        //         }).addTo(maintainenceLayer);
 
-            }
-            maintainencemap.fitBounds(maintainenceLayer.getBounds());
-        }
+        //     }
+        //     maintainencemap.fitBounds(maintainenceLayer.getBounds());
+        // }
 
         function highlightFeature(e) {
             var layer = e.target;
             // if (!L.Browser.ie && !L.Browser.opera) {
             //     layer.bringToFront();
             // }
-                
+
             displayFeatureProps(layer.feature.properties);
         }
 
-        function getDiagramSystemTitle( diagramid) {
+        function getDiagramSystemTitle(diagramid) {
             const ad = systems;
             var sysName = 'NA';
             var diagName = 'NA';
@@ -1307,33 +1341,14 @@
                         }
                     }
                 }
-            const sys_title = ' | '+ sysName + ' ' + diagName;
+            const sys_title = ' | ' + sysName + ' ' + diagName;
 
             return sys_title
         }
 
-        function displayFeatureProps(data) {
-            console.log(data.diagrams);
-            const diagrams = data.diagrams;
-            const diaglen  = diagrams.length;
-            var diag_strings = '';
-            for (let index = 0; index < diaglen; index++) {
-                
-                const diag_id = diagrams[index];
-                diag_strings += getDiagramSystemTitle(diag_id);
-            }
-            $("#selectedFeatureDesc").html(diag_strings);
-            // $("#selectedFeatureDesc").html(data.worlddescription);
-        }
 
-        function resetHighlight(e) {
-            resetFeatureProps();
-        }
 
-        function resetFeatureProps(data) {
-            // $("#selectedFeatureTitle").html('');
-            $("#selectedFeatureDesc").html('Hover over a feature to show details');
-        }
+
 
         function populateIncomeInvestment(investmentdata) {
             var yeildDict = {};
@@ -1577,8 +1592,8 @@
             var checked = $('input:radio[name="mapdisplay"]:checked').val();
             if (checked == 'total') {
                 $("#yearlySliderCont").hide();
-                plotIncomeMap(incomeGrid, 'all', standardizationVar);
-                plotMaintainenceMap(maintainenceGrid, 'all', standardizationVar);
+                // plotIncomeMap(incomeGrid, 'all', standardizationVar);
+                // plotMaintainenceMap(maintainenceGrid, 'all', standardizationVar);
                 plotInvestmentMap(investmentGrid, 'all', standardizationVar);
             } else {
                 $("#yearlySliderCont").show();

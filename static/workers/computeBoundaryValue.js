@@ -113,6 +113,7 @@ function computeBoundaryValue(design, boundary, investmentdata, selectedsystems,
         cbndfeat.properties.totalTax = totalTax;
         cbndfeat.properties.totalIncome = totalIncome;
         cbndfeat.properties.totalValuation = totalValuation;
+        cbndfeat.properties.totalInvestment = totalInvestment;
         opboundaries.features.push(cbndfeat);
         counter += 1;
         self.postMessage({
