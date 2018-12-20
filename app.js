@@ -90,14 +90,14 @@ app.get('/', function(request, response) {
                     "boundaries": JSON.stringify(results[6].geojson),
                     "systemdetail": JSON.stringify(sysdetails),
                 };
-                response.render('designdcf', opts);
+                response.render('investmentanalysis', opts);
             });
 
         });
 
     } else {
         opts = { 'csrfToken': request.csrfToken(), 'boundaries': '0', 'systemdetail': '0', 'apitoken': '0', 'projectid': '0', 'cteamid': '0', "diagramdetail": '0', 'systems': '0', 'synthesisid': '0', "projectdetails": '0' };
-        response.render('designdcf', opts);
+        response.render('investmentanalysis', opts);
     }
 
 });
