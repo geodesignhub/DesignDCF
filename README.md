@@ -12,7 +12,16 @@ You can adjust the WACC to different settings for a new NPV and cash flow analys
 
 ![interface][ui]
 
+![interface][ui2]
+
+[ui0]: https://i.imgur.com/vRyxhr6.jpg "User Interface" 
+
+[ui1]: https://i.imgur.com/Zdf0XVG.jpg "Yearly Interface" 
+
+[ui2]: https://i.imgur.com/3zVDFGF.jpg "Boundary Interface" 
+
 [ui]: https://i.imgur.com/ERVGb6z.png "User Interface"
+
 
 Once the WACC and the NPV has been calculated, maps are generated that show how the investemnts are distributed in the study area. The Spatial Analysis library distributes the investments over a grid. 
 
@@ -24,7 +33,9 @@ In addition to showing the total investment, you can choose to see yearly invest
 
 ![alt text][yearlyortotal]
 
-[yearlyortotal]: https://i.imgur.com/W0m4srV.png "Design Discounted Cash Flow Analysis"
+![interface][ui0]
+
+![interface][ui1]
 
 While the defualt is to show the Cash flow analysis for every system, you can choose to see just specific systems e.g. Transport and Housing and so on. 
 
